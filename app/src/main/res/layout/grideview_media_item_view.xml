@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/mItemRootView"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/mItemParentView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+
+        <FrameLayout
+            android:id="@+id/mItemContentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/mImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/mTitleView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="#77000000"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="标题"
+                android:textColor="#ffffff" />
+
+        </FrameLayout>
+    </FrameLayout>
+</FrameLayout>
