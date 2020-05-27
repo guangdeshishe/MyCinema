@@ -20,8 +20,9 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
 
-class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener,
+class MainActivity : BaseActivity(),
     AdapterView.OnItemClickListener {
+
 
     private val permissions = arrayOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -46,6 +47,9 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener,
         windowManager.defaultDisplay.getMetrics(outMetrics)
         Constant.SCREEN_WIDTH = outMetrics.widthPixels
         Constant.SCREEN_HEIGHT = outMetrics.heightPixels
+        Constant.MEDIA_PADDING = UnitUtil.dp2px(this, 5f)
+        Constant.MEDIA_SIZE_DIFFER = 4 * Constant.MEDIA_PADDING
+
         log("screenWidth:" + Constant.SCREEN_WIDTH + ";screenHeight:" + Constant.SCREEN_HEIGHT)
 
         requestPermission()
@@ -61,10 +65,8 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener,
 //        mHotMovieGridView.adapter = mHotMicroMovieAdapter
 
 
-        mHotMovieGridView.onItemSelectedListener = this
         mHotMovieGridView.onItemClickListener = this
 
-        mHotTVGridView.onItemSelectedListener = this
         mHotTVGridView.onItemClickListener = this
     }
 
@@ -203,16 +205,6 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener,
         }
     }
 
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-
-    }
-
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        var itemView = view as MediaItemView
-        itemView.invalidate()
-//        var animator = AnimationUtils.loadAnimation(this, R.anim.selected)
-//        itemView.startAnimation(animator)
-    }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         var mediaInfo: MediaInfo? = null

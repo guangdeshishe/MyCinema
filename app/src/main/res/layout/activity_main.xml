@@ -2,6 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#0077ef"
+    android:padding="5dp"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -17,14 +19,11 @@
             android:focusable="true"
             android:text="热播电影" />
 
-        <GridView
+        <com.agile.mycinema.MediaGridView
             android:id="@+id/mHotMovieGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:horizontalSpacing="10dp"
-            android:numColumns="6"
-            android:padding="10dp"
-            android:verticalSpacing="10dp" />
+            android:numColumns="6" />
 
         <com.agile.mycinema.CommonTextView
             android:id="@+id/mHotTVTitle"
@@ -33,7 +32,7 @@
             android:focusable="true"
             android:text="热播电视剧" />
 
-        <GridView
+        <com.agile.mycinema.MediaGridView
             android:id="@+id/mHotTVGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
