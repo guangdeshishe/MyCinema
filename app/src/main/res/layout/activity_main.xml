@@ -16,7 +16,6 @@
             android:id="@+id/mHotMovieTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:focusable="true"
             android:text="热播电影" />
 
         <com.agile.mycinema.MediaGridView
@@ -29,7 +28,6 @@
             android:id="@+id/mHotTVTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:focusable="true"
             android:text="热播电视剧" />
 
         <com.agile.mycinema.MediaGridView

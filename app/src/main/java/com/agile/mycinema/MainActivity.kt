@@ -41,7 +41,6 @@ class MainActivity : BaseActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
         val outMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(outMetrics)
@@ -51,6 +50,9 @@ class MainActivity : BaseActivity(),
         Constant.MEDIA_SIZE_DIFFER = 4 * Constant.MEDIA_PADDING
 
         log("screenWidth:" + Constant.SCREEN_WIDTH + ";screenHeight:" + Constant.SCREEN_HEIGHT)
+
+
+        setContentView(R.layout.activity_main)
 
         requestPermission()
         mHotMovieAdapter = MediaGridAdapter(this)
