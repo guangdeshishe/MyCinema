@@ -32,7 +32,7 @@ class MainActivity : BaseActivity(),
         Manifest.permission.ACCESS_NETWORK_STATE,
         Manifest.permission.READ_PHONE_STATE
     ) //需要的权限
-
+    private lateinit var mSuggestMediaAdapter: MediaGridAdapter
     private lateinit var mHotMovieAdapter: MediaGridAdapter
     private lateinit var mHotTVAdapter: MediaGridAdapter
     private lateinit var mHotCartoonAdapter: MediaGridAdapter
@@ -54,6 +54,9 @@ class MainActivity : BaseActivity(),
 
 
         setContentView(R.layout.activity_main)
+        mSuggestMediaAdapter = MediaGridAdapter(this)
+        mSuggestMediaGridView.adapter = mSuggestMediaAdapter
+
         mHotMovieAdapter = MediaGridAdapter(this)
         mHotMovieGridView.adapter = mHotMovieAdapter
         mHotTVAdapter = MediaGridAdapter(this)
@@ -64,7 +67,7 @@ class MainActivity : BaseActivity(),
 //        mHotMovieGridView.adapter = mHotTvShowAdapter
 //        mHotMicroMovieAdapter = MediaGridAdapter(this)
 //        mHotMovieGridView.adapter = mHotMicroMovieAdapter
-
+        mSuggestMediaGridView.onItemClickListener = this
         mHotMovieGridView.onItemClickListener = this
 
         mHotTVGridView.onItemClickListener = this
@@ -73,13 +76,15 @@ class MainActivity : BaseActivity(),
     }
 
     fun loadCacheData() {
+        var SuggestMedias = mMediaDataHelper.getAllMediaInfo(MediaType.Suggest, true)
         var HotMovies = mMediaDataHelper.getAllMediaInfo(MediaType.MOVIE, true)
         var HotTV = mMediaDataHelper.getAllMediaInfo(MediaType.TV, true)
         if (HotMovies.size > 0) {
             isLoadedCache = true
+            mSuggestMediaAdapter.initData(SuggestMedias)
             mHotMovieAdapter.initData(HotMovies)
             mHotTVAdapter.initData(HotTV)
-            mHotMovieGridView.postDelayed({ mHotMovieGridView.requestFocus() }, 500)
+            mHotMovieGridView.postDelayed({ mSuggestMediaGridView.requestFocus() }, 500)
         }
     }
 
@@ -150,6 +155,7 @@ class MainActivity : BaseActivity(),
         when (index) {
             0 -> {
                 log("===轮播数据=== $media")
+                media.type = MediaType.Suggest
             }
             1 -> {
                 log("===热播电影=== $media")
@@ -157,6 +163,7 @@ class MainActivity : BaseActivity(),
             }
             2 -> {
                 log("===正在热映(电影)=== $media")
+                media.type = MediaType.MOVIE
             }
             3 -> {
                 log("===热播电视剧=== $media")
@@ -164,6 +171,7 @@ class MainActivity : BaseActivity(),
             }
             4 -> {
                 log("===正在热映(电视剧)=== $media")
+                media.type = MediaType.TV
             }
             5 -> {
                 log("===热播动漫=== $media")
@@ -224,7 +232,10 @@ class MainActivity : BaseActivity(),
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         var mediaInfo: MediaInfo? = null
-        if (parent == mHotMovieGridView) {
+        if (parent == mSuggestMediaGridView) {
+            mediaInfo = mSuggestMediaAdapter.getItem(position) as MediaInfo
+
+        } else if (parent == mHotMovieGridView) {
             mediaInfo = mHotMovieAdapter.getItem(position) as MediaInfo
 
         } else if (parent == mHotTVGridView) {

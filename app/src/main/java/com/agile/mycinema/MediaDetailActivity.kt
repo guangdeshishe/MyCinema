@@ -41,12 +41,17 @@ class MediaDetailActivity : BaseActivity() {
         if (isLoaded) {
             return
         }
-        isLoaded = true;
+
         mMediaPlayerContentView.mediaName = mMediaInfo.title
         mTitleView.text = mMediaInfo.title
         mDescribeView.text = mMediaInfo.describe
         mDescribeFullView.text = mMediaInfo.describe
-        mAdapter.initData(mMediaDataHelper.getAllMediaPlayInfo(mMediaInfo))
+        var listData = mMediaDataHelper.getAllMediaPlayInfo(mMediaInfo)
+        if (listData.size == 0) {
+            return
+        }
+        isLoaded = true;
+        mAdapter.initData(listData)
         mPlayGridView.postDelayed({
             mPlayGridView.requestFocus()
             val selectedItem = 0

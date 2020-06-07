@@ -27,7 +27,10 @@ class PlayGridAdapter(context: Activity) : BaseAdapter() {
     }
 
     override fun getItem(position: Int): Any {
-        return mPlayInfos[position]
+        if (position >= 0 && position < mPlayInfos.size) {
+            return mPlayInfos[position]
+        }
+        return PlayInfo();
     }
 
     override fun getItemId(position: Int): Long {

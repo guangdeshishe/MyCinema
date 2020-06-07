@@ -13,6 +13,18 @@
         tools:context=".MainActivity">
 
         <com.agile.mycinema.CommonTextView
+            android:id="@+id/mSuggestMediaTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="推荐影视" />
+
+        <com.agile.mycinema.MediaGridView
+            android:id="@+id/mSuggestMediaGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="6" />
+
+        <com.agile.mycinema.CommonTextView
             android:id="@+id/mHotMovieTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

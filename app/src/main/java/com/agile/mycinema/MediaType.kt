@@ -2,6 +2,7 @@ package com.agile.mycinema
 
 enum class MediaType() {
     UnKnow(),//未知分类
+    Suggest(),//推荐
     MOVIE(), //电影
     TV(),//电视剧
     CARTOON(), //卡通动漫

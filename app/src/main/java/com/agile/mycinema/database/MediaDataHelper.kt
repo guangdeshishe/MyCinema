@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.agile.mycinema.MediaInfo
 import com.agile.mycinema.MediaType
 import com.agile.mycinema.PlayInfo
+import com.agile.mycinema.utils.DateTimeUtil
 import java.util.*
 
 
@@ -33,6 +34,7 @@ class MediaDataHelper(
         const val MEDIA_IS_HOT = "isHot";//是否热门
         const val MEDIA_PLAY_URL = "playUrl";//播放详情界网址
         const val MEDIA_VIDEO_URL = "videoUrl";//真正的视频播放链接
+        const val MEDIA_UPDATE_TIME = "updateTime";//更新时间
         private lateinit var instance: MediaDataHelper
         fun getInstance(context: Context): MediaDataHelper {
             if (!this::instance.isInitialized) {
@@ -51,7 +53,8 @@ class MediaDataHelper(
                     "$MEDIA_PAGE_URL text default '', " +
                     "$MEDIA_TYPE text default ''," +
                     "$MEDIA_DESCRIBE text default ''," +
-                    "$MEDIA_IS_HOT integer default 0)"
+                    "$MEDIA_IS_HOT integer default 0," +
+                    "$MEDIA_UPDATE_TIME date)"
         val createMediaPlayUrlTable =
             "create table $MEDIA_PLAY_INFO_TABLE(" +
                     "_id integer primary key autoincrement," +
@@ -59,7 +62,8 @@ class MediaDataHelper(
                     "$MEDIA_TITLE text default ''," +
                     "$MEDIA_SUMMARY text default '', " +
                     "$MEDIA_PLAY_URL text default ''," +
-                    "$MEDIA_VIDEO_URL text default '')"
+                    "$MEDIA_VIDEO_URL text default ''," +
+                    "$MEDIA_UPDATE_TIME date)"
         db.execSQL(createMediaInfoTable)
         db.execSQL(createMediaPlayUrlTable)
     }
@@ -84,6 +88,7 @@ class MediaDataHelper(
         if (playInfo.videoUrl.isNotEmpty()) {
             cv.put(MEDIA_VIDEO_URL, playInfo.videoUrl)
         }
+        cv.put(MEDIA_UPDATE_TIME, DateTimeUtil.getNowDateTime())
 
         var oldPlayInfo = getPlayInfo(playInfo.mediaId, playInfo.summary)
         if (oldPlayInfo == null) {//新增
@@ -112,7 +117,7 @@ class MediaDataHelper(
         if (mediaInfo.describe.isNotEmpty()) {
             cv.put(MEDIA_DESCRIBE, mediaInfo.describe)
         }
-
+        cv.put(MEDIA_UPDATE_TIME, DateTimeUtil.getNowDateTime())
         val oldMediaInfo = getMediaInfo(mediaInfo.title)
         if (oldMediaInfo == null) {//新增
             val isHot = if (mediaInfo.isHot) {
