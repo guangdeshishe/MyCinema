@@ -17,6 +17,7 @@ class PlayGridAdapter(context: Activity) : BaseAdapter() {
     }
 
     fun initData(medias: LinkedList<PlayInfo>) {
+        mPlayInfos.clear()
         mPlayInfos.addAll(medias)
         notifyDataSetChanged()
     }

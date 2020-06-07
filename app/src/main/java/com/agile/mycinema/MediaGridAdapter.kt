@@ -17,6 +17,7 @@ class MediaGridAdapter(context: Activity) : BaseAdapter() {
     }
 
     fun initData(medias: LinkedList<MediaInfo>) {
+        mMedias.clear()
         mMedias.addAll(medias)
         notifyDataSetChanged()
     }

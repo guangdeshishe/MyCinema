@@ -8,9 +8,8 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.AdapterView
-import android.widget.GridView
 
-class MediaGridView(context: Context?, attrs: AttributeSet?) : GridView(context, attrs),
+class MediaGridView(context: Context?, attrs: AttributeSet?) : WrapHeightGridView(context, attrs),
     AdapterView.OnItemSelectedListener {
     var sourceWidth = 0
     var sourceHeight = 0
@@ -36,9 +35,10 @@ class MediaGridView(context: Context?, attrs: AttributeSet?) : GridView(context,
     fun clearLastItem() {
         if (lastSelectedView != null) {
             val oldView = (lastSelectedView as ISelectListener).getContentView()
-            val diffValue = 1000f * Constant.MEDIA_SIZE_DIFFER
-            val oldAnimator = getAnimator(oldView, diffValue, 0f)
-            oldAnimator.start()
+            lastSelectedView?.onSelectChanged(false)
+//            val diffValue = 1000f * Constant.MEDIA_SIZE_DIFFER
+//            val oldAnimator = getAnimator(oldView, diffValue, 0f)
+//            oldAnimator.start()
             lastSelectedView = null
         }
     }
@@ -90,5 +90,4 @@ class MediaGridView(context: Context?, attrs: AttributeSet?) : GridView(context,
         }
         return animator
     }
-
 }

@@ -43,7 +43,7 @@ class MediaItemView(context: Context) : FrameLayout(context), ISelectListener {
     }
 
     fun setData(mediaInfo: MediaInfo) {
-        Glide.with(context).load(mediaInfo.image).into(mImageView);
+        Glide.with(context).load(mediaInfo.image).error(R.mipmap.default_img).into(mImageView);
         mTitleView.text = mediaInfo.title
     }
 

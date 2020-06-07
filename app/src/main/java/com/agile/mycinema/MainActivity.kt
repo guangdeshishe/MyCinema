@@ -38,7 +38,7 @@ class MainActivity : BaseActivity(),
     private lateinit var mHotCartoonAdapter: MediaGridAdapter
     private lateinit var mHotTvShowAdapter: MediaGridAdapter
     private lateinit var mHotMicroMovieAdapter: MediaGridAdapter
-
+    private var isLoadedCache = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -47,14 +47,13 @@ class MainActivity : BaseActivity(),
         Constant.SCREEN_WIDTH = outMetrics.widthPixels
         Constant.SCREEN_HEIGHT = outMetrics.heightPixels
         Constant.MEDIA_PADDING = UnitUtil.dp2px(this, 5f)
+        Constant.CONTENT_MARGIN = UnitUtil.dp2px(this, 10f)
         Constant.MEDIA_SIZE_DIFFER = 4 * Constant.MEDIA_PADDING
 
         log("screenWidth:" + Constant.SCREEN_WIDTH + ";screenHeight:" + Constant.SCREEN_HEIGHT)
 
 
         setContentView(R.layout.activity_main)
-
-        requestPermission()
         mHotMovieAdapter = MediaGridAdapter(this)
         mHotMovieGridView.adapter = mHotMovieAdapter
         mHotTVAdapter = MediaGridAdapter(this)
@@ -66,30 +65,43 @@ class MainActivity : BaseActivity(),
 //        mHotMicroMovieAdapter = MediaGridAdapter(this)
 //        mHotMovieGridView.adapter = mHotMicroMovieAdapter
 
-
         mHotMovieGridView.onItemClickListener = this
 
         mHotTVGridView.onItemClickListener = this
+
+        requestPermission()
+    }
+
+    fun loadCacheData() {
+        var HotMovies = mMediaDataHelper.getAllMediaInfo(MediaType.MOVIE, true)
+        var HotTV = mMediaDataHelper.getAllMediaInfo(MediaType.TV, true)
+        if (HotMovies.size > 0) {
+            isLoadedCache = true
+            mHotMovieAdapter.initData(HotMovies)
+            mHotTVAdapter.initData(HotTV)
+            mHotMovieGridView.postDelayed({ mHotMovieGridView.requestFocus() }, 500)
+        }
     }
 
     fun initView() {
+        loadCacheData()
+//        showToast("后台正在更新网络数据")
         var host = HOST
         OkGo.get<String>(host)
             .tag(this)
             .cacheKey("cacheKey1")            // 设置当前请求的缓存key,建议每个不同功能的请求设置一个
-//            .cacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)    // 缓存模式，详细请看缓存介绍
             .execute(object : StringCallback() {
                 override fun onSuccess(response: Response<String>) {
                     val result = response.body()
                     val doc: Document = Jsoup.parse(result)
                     log(doc.title())
-                    Toast.makeText(this@MainActivity, "" + doc.title(), Toast.LENGTH_LONG).show()
+//                    Toast.makeText(this@MainActivity, "" + doc.title(), Toast.LENGTH_LONG).show()
                     val ulElements: Elements = doc.select("ul")
                     var index = 0;
                     for (ulElement in ulElements) {
                         val ulDoc: Document = Jsoup.parse(ulElement.html())
                         val liElements: Elements = ulDoc.select("li")
-                        var type = MediaInfo.Type.MOVIE;
+                        var type = MediaType.MOVIE;
                         if (liElements.size == 0) {
                             continue
                         }
@@ -112,17 +124,18 @@ class MainActivity : BaseActivity(),
                             }
                             val mediaUrl = host + linkItem.attr("href")
 
-                            var mediaInfo = MediaInfo(type, title, imageUrl, mediaUrl)
-
+                            var mediaInfo = MediaInfo(type, title, imageUrl, mediaUrl, title, true)
                             addMedia(index, mediaInfo);
                         }
                         if (isOk) {
                             index++;
                         }
                     }
+//                    if(!isLoadedCache){
+//                        showToast("在线读取数据成功")
+                    loadCacheData()
+//                    }
 
-                    mHotMovieAdapter.initData(MediaManager.HotMovies)
-                    mHotTVAdapter.initData(MediaManager.HotTV)
                 }
 
                 override fun onError(response: Response<String>) {
@@ -140,31 +153,32 @@ class MainActivity : BaseActivity(),
             }
             1 -> {
                 log("===热播电影=== $media")
-                MediaManager.HotMovies.add(media)
+                media.type = MediaType.MOVIE
             }
             2 -> {
                 log("===正在热映(电影)=== $media")
             }
             3 -> {
                 log("===热播电视剧=== $media")
-                MediaManager.HotTV.add(media)
+                media.type = MediaType.TV
             }
             4 -> {
                 log("===正在热映(电视剧)=== $media")
             }
             5 -> {
                 log("===热播动漫=== $media")
-                MediaManager.HotCartoon.add(media)
+                media.type = MediaType.CARTOON
             }
             6 -> {
                 log("===热播综艺=== $media")
-                MediaManager.HotTvShow.add(media)
+                media.type = MediaType.TVSHOW
             }
             7 -> {
                 log("===热播微电影=== $media")
-                MediaManager.HotMicroMovie.add(media)
+                media.type = MediaType.MicroMovie
             }
         }
+        mMediaDataHelper.updateMediaInfo(media)
     }
 
     override fun onRequestPermissionsResult(

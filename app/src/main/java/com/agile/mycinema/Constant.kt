@@ -7,6 +7,7 @@ class Constant {
         var MEDIA_WIDTH_HEIGHT_SCALE = 270f / 381f
         var MEDIA_PADDING = 0
         var MEDIA_SIZE_DIFFER = 0
+        var CONTENT_MARGIN = 0
         var HOST = "http://m.kkkkwo.com"
     }
 }

@@ -2,52 +2,46 @@ package com.agile.mycinema
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Rect
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
-import android.widget.*
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.Toast
+import kotlinx.android.synthetic.main.media_player_content_view.view.*
 
 class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
     MediaPlayer.OnPreparedListener {
 
-    var paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    var mMediaPlayer = VideoView(context, attrs)
-    var mediaNameView = TextView(context, attrs)
-    var mMediaController = MediaController(context)
+    var paintUtil = PaintUtil(this)
+
+    //    var mMediaPlayer = VideoView(context, attrs)
+//    var mediaNameView = TextView(context, attrs)
+//    var mMediaController = MediaController(context)
     var isFullScreen = false
     var mediaName = ""
 
-    private val DEFAULT_SPEED = 10 * 1000//默认快进速度10秒
-    var speed = DEFAULT_SPEED
 
     init {
+        inflate(context, R.layout.media_player_content_view, this)
+        isFocusable = true
+//        mediaNameView.setTextColor(Color.WHITE)
+//        var padding = 10
+//        mediaNameView.setPadding(padding, padding, padding, padding)
 
-        setWillNotDraw(false)
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f
-        paint.color = Color.RED
-        mediaNameView.setTextColor(Color.WHITE)
-        var padding = 10
-        mediaNameView.setPadding(padding, padding, padding, padding)
+//        addView(mMediaPlayer, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+//        addView(mediaNameView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
 
-        addView(mMediaPlayer, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-        addView(mediaNameView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
-
-        mMediaPlayer.setMediaController(mMediaController)
+//        mMediaPlayer.setMediaController(mMediaController)
+        mMediaController.mMediaPlayer = mMediaPlayer
         mMediaPlayer.setOnPreparedListener(this);
         setOnClickListener {
             if (isFullScreen) {
-                if (mMediaController.isShowing) {
-                    if (mMediaPlayer.isPlaying) {
-                        mMediaPlayer.pause()
-                    } else {
-                        mMediaPlayer.resume()
-                    }
+                if (mMediaController.isShowing()) {
+                    mMediaController.handlePause()
                 } else {
                     mMediaController.show()
 
@@ -84,7 +78,7 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
     }
 
     fun resume() {
-        mMediaPlayer.resume()
+        mMediaPlayer.start()
     }
 
     fun onBackPressed(): Boolean {
@@ -105,25 +99,47 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         if (isSelected) {
-            canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+            paintUtil.onDraw(canvas)
         }
     }
 
     override fun onPrepared(mp: MediaPlayer?) {
         mMediaPlayer.start()
+        mMediaController.show()
     }
 
     fun switchFullScreen(fullScreen: Boolean) {
         var targetWidth = Constant.SCREEN_WIDTH
         var targetHeight = Constant.SCREEN_HEIGHT
+        var margin = 0
         if (!fullScreen) {
             targetWidth = Constant.SCREEN_WIDTH * 3 / 8
             targetHeight = Constant.SCREEN_HEIGHT * 3 / 8
-
+            setPadding(
+                Constant.MEDIA_PADDING,
+                Constant.MEDIA_PADDING,
+                Constant.MEDIA_PADDING,
+                Constant.MEDIA_PADDING
+            )
+            if (isFocused) {
+                isSelected = true
+            }
+            margin = Constant.CONTENT_MARGIN
+        } else {
+            setPadding(
+                0,
+                0,
+                0,
+                0
+            )
+            isSelected = false
+            margin = 0
         }
         var lp = layoutParams
         lp.width = targetWidth
         lp.height = targetHeight
+        lp = lp as LinearLayout.LayoutParams
+        lp.setMargins(margin, margin, margin, margin)
         this.layoutParams = lp
 
         lp = mMediaPlayer.layoutParams
@@ -132,35 +148,10 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
         mMediaPlayer.layoutParams = lp
 
         isFullScreen = fullScreen
+
+//        invalidate()
     }
 
-    //前进
-    fun progressForward() {
-        val position: Int = mMediaPlayer.currentPosition//当前时长
-        val duration: Int = mMediaPlayer.duration//总的时长
-        var targetPosition = position + speed
-        if (targetPosition > duration) {
-            targetPosition = duration
-        }
-        mMediaPlayer.seekTo(targetPosition)
-        speed += DEFAULT_SPEED
-    }
-
-    fun resetSpeed() {
-        speed = DEFAULT_SPEED
-    }
-
-    //后退
-    fun progressBack() {
-        val position: Int = mMediaPlayer.currentPosition//当前时长
-        val duration: Int = mMediaPlayer.duration//总的时长
-        var targetPosition = position - speed
-        if (targetPosition < 0) {
-            targetPosition = 0
-        }
-        mMediaPlayer.seekTo(targetPosition)
-        speed += DEFAULT_SPEED
-    }
 
     fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
@@ -178,19 +169,19 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
                 if (event?.action == KeyEvent.ACTION_DOWN) {
 
                     showToast("开始长按右键" + event?.getRepeatCount())
-                    progressForward()
+                    mMediaController.progressForward()
                 } else if (event?.action == KeyEvent.ACTION_UP) {
                     showToast("结束长按右键")
-                    resetSpeed()
+                    mMediaController.resetSpeed()
                 }
             } else if (keyCode == 21) {
                 if (event?.action == KeyEvent.ACTION_DOWN) {
 
                     showToast("开始长按左键" + event?.getRepeatCount())
-                    progressBack()
+                    mMediaController.progressBack()
                 } else if (event?.action == KeyEvent.ACTION_UP) {
                     showToast("结束长按左键")
-                    resetSpeed()
+                    mMediaController.resetSpeed()
                 }
             } else if (keyCode == 19) {
                 showToast("长按上键")

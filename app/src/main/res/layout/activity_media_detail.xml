@@ -1,32 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#0077ef">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/mTopContentView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.agile.mycinema.MediaPlayContentView
             android:id="@+id/mMediaPlayerContentView"
             android:layout_width="300dp"
-            android:focusable="true"
-            android:layout_height="200dp" />
+            android:layout_height="200dp"
+            android:layout_margin="10dp"
+            android:nextFocusRight="@+id/mTitleDescribeView"
+            android:nextFocusDown="@+id/mPlayGridView" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <com.agile.mycinema.CommonLinearLayout
+            android:id="@+id/mTitleDescribeView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="10dp"
+            android:nextFocusLeft="@+id/mMediaPlayerContentView"
+            android:nextFocusDown="@+id/mPlayGridView"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mTitleView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text="标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题"
+                android:textColor="@color/colorTitle"
+                android:textSize="20sp" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/mDescribeView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:text="描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述"
+                    android:textColor="@color/colorTitle"
+                    android:textSize="15sp" />
+            </ScrollView>
+        </com.agile.mycinema.CommonLinearLayout>
     </LinearLayout>
 
-
-    <GridView
+    <com.agile.mycinema.PlayGridView
         android:id="@+id/mPlayGridView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:horizontalSpacing="10dp"
-        android:numColumns="6"
-        android:padding="10dp"
-        android:verticalSpacing="10dp" />
-</LinearLayout>
+        android:nextFocusUp="@+id/mMediaPlayerContentView"
+        android:numColumns="10"
+        android:verticalSpacing="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mTopContentView" />
+
+    <ScrollView
+        android:id="@+id/mDescribeFullContextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#aa000000"
+        android:focusable="true"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/mDescribeFullView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:text="描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述"
+            android:textColor="@color/colorTitle"
+            android:textSize="20sp" />
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
