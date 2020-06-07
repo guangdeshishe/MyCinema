@@ -22,6 +22,7 @@ class MediaDetailActivity : BaseActivity() {
     //    var mPlayInfoList = LinkedList<PlayInfo>()
     lateinit var mAdapter: PlayGridAdapter
     lateinit var mMediaInfo: MediaInfo
+    var isLoaded = false
 
     companion object {
         private const val MEDIA_INFO_KEY = "media_info_key"
@@ -37,12 +38,23 @@ class MediaDetailActivity : BaseActivity() {
     }
 
     fun updateMediaInfo() {
+        if (isLoaded) {
+            return
+        }
+        isLoaded = true;
         mMediaPlayerContentView.mediaName = mMediaInfo.title
         mTitleView.text = mMediaInfo.title
         mDescribeView.text = mMediaInfo.describe
         mDescribeFullView.text = mMediaInfo.describe
         mAdapter.initData(mMediaDataHelper.getAllMediaPlayInfo(mMediaInfo))
-        mPlayGridView.postDelayed({ mPlayGridView.requestFocus() }, 500)
+        mPlayGridView.postDelayed({
+            mPlayGridView.requestFocus()
+            val selectedItem = 0
+            mPlayGridView.setSelection(selectedItem)
+//            if (!mMediaPlayerContentView.mMediaPlayer.isPlaying) {
+            handleItemClick(selectedItem)
+//            }
+        }, 500)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,46 +170,52 @@ class MediaDetailActivity : BaseActivity() {
 
         mPlayGridView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
-                val playInfo = mAdapter.getItem(position) as PlayInfo
-                if (playInfo.videoUrl.isNotEmpty()) {
-                    mMediaPlayerContentView.setVideoURI(playInfo.videoUrl, playInfo.summary)
-                    return@OnItemClickListener
-                }
-                OkGo.get<String>(playInfo.url)
-                    .tag(this)
-                    .cacheKey("cacheKey3")            // 设置当前请求的缓存key,建议每个不同功能的请求设置一个
-//                    .cacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)    // 缓存模式，详细请看缓存介绍
-                    .execute(object : StringCallback() {
-                        override fun onSuccess(response: Response<String>) {
-                            val result = response.body()
-                            val doc: Document = Jsoup.parse(result)
-
-                            val iframeElements: Elements = doc.select("iframe")
-                            if (iframeElements.size == 0) {
-                                showToast("获取播放地址失败")
-                            }
-                            var playUrl = iframeElements[0].attr("src")//m3u8格式
-                            log(playInfo.summary + " full-> " + playUrl)
-                            val index = playUrl.indexOf("=")
-                            playUrl = playUrl.substring(index + 1, playUrl.length)
-                            log(playInfo.summary + " m3u8-> " + playUrl)
-                            playInfo.videoUrl = playUrl
-                            mMediaDataHelper.updateMediaPlayInfo(playInfo)
-                            mMediaPlayerContentView.setVideoURI(playUrl, playInfo.summary)
-
-                        }
-
-                        override fun onError(response: Response<String>) {
-                            super.onError(response)
-                            Toast.makeText(
-                                this@MediaDetailActivity,
-                                "" + response.message(),
-                                Toast.LENGTH_LONG
-                            )
-                                .show()
-                        }
-                    })
+                handleItemClick(position)
             }
+    }
+
+    fun handleItemClick(position: Int) {
+        val playInfo = mAdapter.getItem(position) as PlayInfo
+        mAdapter.selectedPosition = position
+        mAdapter.notifyDataSetChanged()
+        if (playInfo.videoUrl.isNotEmpty()) {
+            mMediaPlayerContentView.setVideoURI(playInfo.videoUrl, playInfo.summary)
+            return
+        }
+        OkGo.get<String>(playInfo.url)
+            .tag(this)
+            .cacheKey("cacheKey3")            // 设置当前请求的缓存key,建议每个不同功能的请求设置一个
+//                    .cacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)    // 缓存模式，详细请看缓存介绍
+            .execute(object : StringCallback() {
+                override fun onSuccess(response: Response<String>) {
+                    val result = response.body()
+                    val doc: Document = Jsoup.parse(result)
+
+                    val iframeElements: Elements = doc.select("iframe")
+                    if (iframeElements.size == 0) {
+                        showToast("获取播放地址失败")
+                    }
+                    var playUrl = iframeElements[0].attr("src")//m3u8格式
+                    log(playInfo.summary + " full-> " + playUrl)
+                    val index = playUrl.indexOf("=")
+                    playUrl = playUrl.substring(index + 1, playUrl.length)
+                    log(playInfo.summary + " m3u8-> " + playUrl)
+                    playInfo.videoUrl = playUrl
+                    mMediaDataHelper.updateMediaPlayInfo(playInfo)
+                    mMediaPlayerContentView.setVideoURI(playUrl, playInfo.summary)
+
+                }
+
+                override fun onError(response: Response<String>) {
+                    super.onError(response)
+                    Toast.makeText(
+                        this@MediaDetailActivity,
+                        "" + response.message(),
+                        Toast.LENGTH_LONG
+                    )
+                        .show()
+                }
+            })
     }
 
     override fun onBackPressed() {

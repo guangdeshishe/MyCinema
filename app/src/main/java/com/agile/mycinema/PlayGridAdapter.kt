@@ -11,10 +11,7 @@ import java.util.*
 class PlayGridAdapter(context: Activity) : BaseAdapter() {
     var mPlayInfos = LinkedList<PlayInfo>()
     var mContext = context
-
-    init {
-
-    }
+    var selectedPosition = 0
 
     fun initData(medias: LinkedList<PlayInfo>) {
         mPlayInfos.clear()
@@ -25,7 +22,7 @@ class PlayGridAdapter(context: Activity) : BaseAdapter() {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var view = PlayItemView(mContext)
         var playInfo = mPlayInfos[position]
-        view.setData(playInfo)
+        view.setData(playInfo, selectedPosition == position)
         return view
     }
 

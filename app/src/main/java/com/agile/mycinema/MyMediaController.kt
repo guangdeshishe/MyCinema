@@ -25,6 +25,7 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     var mFormatter: Formatter = Formatter(mFormatBuilder, Locale.getDefault())
 
     val mainHandler = MyHandler(this)
+    var mUpdateThread: Thread? = null
 
     companion object {
         class MyHandler(controller: MyMediaController) :
@@ -32,7 +33,11 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
             var weakReference = WeakReference<MyMediaController>(controller)
             override fun handleMessage(msg: Message) {
                 var controller = weakReference.get()
-                controller?.updateProgress()
+                when (msg.what) {
+                    0 -> controller?.updateProgress()
+                    1 -> controller?.hide()
+                }
+
             }
         }
     }
@@ -53,6 +58,7 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     }
 
     fun handlePause() {
+        show()
         if (mMediaPlayer.isPlaying) {
             (mPlayControllerPause as ImageView).setImageResource(R.drawable.ic_media_controller_play)
             mMediaPlayer.pause()
@@ -73,22 +79,25 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     fun show(timeout: Long) {
         visibility = View.VISIBLE
         updateProgress()
-        object : Thread() {
-            override fun run() {
-                try {
-                    while (mMediaPlayer.isPlaying && isShowing()) {
-                        // 如果正在播放，没0.5.毫秒更新一次进度条
-                        mainHandler.sendEmptyMessage(0)
-                        sleep(500)
+        if (mUpdateThread == null) {
+            mUpdateThread = object : Thread() {
+                override fun run() {
+                    try {
+                        while (mMediaPlayer.isPlaying && isShowing()) {
+                            // 如果正在播放，没0.5.毫秒更新一次进度条
+                            mainHandler.sendEmptyMessage(0)
+                            sleep(500)
+                        }
+                        mUpdateThread = null
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
             }
-        }.start()
-        postDelayed({
-            hide()
-        }, timeout)
+        }
+        mUpdateThread?.start()
+        mainHandler.removeMessages(1)
+        mainHandler.sendEmptyMessageDelayed(1, timeout)
     }
 
     fun updateProgress() {
@@ -130,6 +139,7 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
 
     //前进
     fun progressForward() {
+        show()
         val position: Int = mMediaPlayer.currentPosition//当前时长
         val duration: Int = mMediaPlayer.duration//总的时长
         var targetPosition = position + speed
@@ -146,6 +156,7 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
 
     //后退
     fun progressBack() {
+        show()
         val position: Int = mMediaPlayer.currentPosition//当前时长
         val duration: Int = mMediaPlayer.duration//总的时长
         var targetPosition = position - speed

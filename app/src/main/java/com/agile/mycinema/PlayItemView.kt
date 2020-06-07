@@ -2,8 +2,10 @@ package com.agile.mycinema
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.grideview_media_item_view.view.*
 
 class PlayItemView(context: Context) : FrameLayout(context), ISelectListener {
@@ -18,8 +20,15 @@ class PlayItemView(context: Context) : FrameLayout(context), ISelectListener {
 
     }
 
-    fun setData(mediaInfo: PlayInfo) {
+    fun setData(mediaInfo: PlayInfo, isSelected: Boolean) {
         mTitleView.text = mediaInfo.summary
+        if (isSelected) {
+            mTitleView.setBackgroundColor(Color.parseColor("#ffffff"))
+            mTitleView.setTextColor(ContextCompat.getColor(context, R.color.colorTheme))
+        } else {
+            mTitleView.setBackgroundColor(Color.parseColor("#77000000"))
+            mTitleView.setTextColor(Color.parseColor("#ffffff"))
+        }
     }
 
     override fun onDraw(canvas: Canvas?) {

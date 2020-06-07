@@ -168,28 +168,31 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
             if (keyCode == 22) {
                 if (event?.action == KeyEvent.ACTION_DOWN) {
 
-                    showToast("开始长按右键" + event?.getRepeatCount())
+//                    showToast("开始长按右键" + event?.getRepeatCount())
                     mMediaController.progressForward()
                 } else if (event?.action == KeyEvent.ACTION_UP) {
-                    showToast("结束长按右键")
+//                    showToast("结束长按右键")
                     mMediaController.resetSpeed()
                 }
+                return true
             } else if (keyCode == 21) {
                 if (event?.action == KeyEvent.ACTION_DOWN) {
 
-                    showToast("开始长按左键" + event?.getRepeatCount())
+//                    showToast("开始长按左键" + event?.getRepeatCount())
                     mMediaController.progressBack()
                 } else if (event?.action == KeyEvent.ACTION_UP) {
-                    showToast("结束长按左键")
+//                    showToast("结束长按左键")
                     mMediaController.resetSpeed()
                 }
+                return true
             } else if (keyCode == 19) {
-                showToast("长按上键")
+//                showToast("长按上键")
                 return true
             } else if (keyCode == 20) {
-                showToast("长按下键")
+//                showToast("长按下键")
                 return true
             }
+//            return true
         }
         return super.dispatchKeyEvent(event)
     }
