@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import com.agile.mycinema.utils.PaintUtil
 
 class CommonLinearLayout(context: Context, attrs: AttributeSet?) :
     LinearLayout(context, attrs) {

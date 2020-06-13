@@ -5,8 +5,9 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import android.widget.AdapterView
+import android.widget.GridView
 
-class PlayGridView(context: Context?, attrs: AttributeSet?) : WrapHeightGridView(context, attrs),
+class PlayGridView(context: Context?, attrs: AttributeSet?) : GridView(context, attrs),
     AdapterView.OnItemSelectedListener {
     var sourceWidth = 0
     var sourceHeight = 0

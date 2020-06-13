@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.agile.mycinema.MediaInfo
 import com.agile.mycinema.MediaType
 import com.agile.mycinema.PlayInfo
-import com.agile.mycinema.utils.DateTimeUtil
 import java.util.*
 
 
@@ -29,9 +28,15 @@ class MediaDataHelper(
         const val MEDIA_SUMMARY = "summary";//例如：第一集
         const val MEDIA_IMAGE_URL = "imageUrl";
         const val MEDIA_PAGE_URL = "pageUrl";//影视详情界面
-        const val MEDIA_TYPE = "type";
+        const val MEDIA_TYPE = "type";//电影、电视剧
+        const val MEDIA_SCORE = "score"//评分
+        const val MEDIA_LABEL = "label"//标签：更新至多少集
+        const val MEDIA_SUB_TYPE = "subType";//喜剧、动作
+        const val MEDIA_AREA = "area"//上映地区
+        const val MEDIA_YEAR = "year"//上映时间
         const val MEDIA_DESCRIBE = "describe";//影视介绍
         const val MEDIA_IS_HOT = "isHot";//是否热门
+        const val MEDIA_IS_Top = "isTop";//是否排行榜中数据
         const val MEDIA_PLAY_URL = "playUrl";//播放详情界网址
         const val MEDIA_VIDEO_URL = "videoUrl";//真正的视频播放链接
         const val MEDIA_UPDATE_TIME = "updateTime";//更新时间
@@ -52,9 +57,15 @@ class MediaDataHelper(
                     "$MEDIA_IMAGE_URL text default ''," +
                     "$MEDIA_PAGE_URL text default '', " +
                     "$MEDIA_TYPE text default ''," +
+                    "$MEDIA_SUB_TYPE text default ''," +
+                    "$MEDIA_SCORE text default ''," +
+                    "$MEDIA_LABEL text default ''," +
+                    "$MEDIA_AREA text default ''," +
+                    "$MEDIA_YEAR text default ''," +
                     "$MEDIA_DESCRIBE text default ''," +
                     "$MEDIA_IS_HOT integer default 0," +
-                    "$MEDIA_UPDATE_TIME date)"
+                    "$MEDIA_IS_Top integer default 0," +
+                    "$MEDIA_UPDATE_TIME TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)"
         val createMediaPlayUrlTable =
             "create table $MEDIA_PLAY_INFO_TABLE(" +
                     "_id integer primary key autoincrement," +
@@ -63,7 +74,7 @@ class MediaDataHelper(
                     "$MEDIA_SUMMARY text default '', " +
                     "$MEDIA_PLAY_URL text default ''," +
                     "$MEDIA_VIDEO_URL text default ''," +
-                    "$MEDIA_UPDATE_TIME date)"
+                    "$MEDIA_UPDATE_TIME TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)"
         db.execSQL(createMediaInfoTable)
         db.execSQL(createMediaPlayUrlTable)
     }
@@ -88,7 +99,6 @@ class MediaDataHelper(
         if (playInfo.videoUrl.isNotEmpty()) {
             cv.put(MEDIA_VIDEO_URL, playInfo.videoUrl)
         }
-        cv.put(MEDIA_UPDATE_TIME, DateTimeUtil.getNowDateTime())
 
         var oldPlayInfo = getPlayInfo(playInfo.mediaId, playInfo.summary)
         if (oldPlayInfo == null) {//新增
@@ -114,23 +124,42 @@ class MediaDataHelper(
             cv.put(MEDIA_PAGE_URL, mediaInfo.url)
         }
         cv.put(MEDIA_TYPE, mediaInfo.type.toString())
+        cv.put(MEDIA_SUB_TYPE, mediaInfo.subType.toString())
         if (mediaInfo.describe.isNotEmpty()) {
             cv.put(MEDIA_DESCRIBE, mediaInfo.describe)
         }
-        cv.put(MEDIA_UPDATE_TIME, DateTimeUtil.getNowDateTime())
+        if (mediaInfo.year.isNotEmpty()) {
+            cv.put(MEDIA_YEAR, mediaInfo.describe)
+        }
+        if (mediaInfo.area.isNotEmpty()) {
+            cv.put(MEDIA_AREA, mediaInfo.describe)
+        }
+        if (mediaInfo.score.isNotEmpty()) {
+            cv.put(MEDIA_SCORE, mediaInfo.score)
+        }
+        if (mediaInfo.label.isNotEmpty()) {
+            cv.put(MEDIA_LABEL, mediaInfo.label)
+        }
+        cv.put(MEDIA_IS_HOT, getBooleanValue(mediaInfo.isHot))
+        cv.put(MEDIA_IS_Top, getBooleanValue(mediaInfo.isTop))
         val oldMediaInfo = getMediaInfo(mediaInfo.title)
+
         if (oldMediaInfo == null) {//新增
-            val isHot = if (mediaInfo.isHot) {
-                1
-            } else {
-                0
-            }
-            cv.put(MEDIA_IS_HOT, isHot)
             db.insert(MEDIA_INFO_TABLE, null, cv)
         } else {//更新
+            cv.put(MEDIA_IS_HOT, getBooleanValue(oldMediaInfo.isHot))
+            cv.put(MEDIA_IS_Top, getBooleanValue(oldMediaInfo.isTop))
             db.update(MEDIA_INFO_TABLE, cv, "$VALUE_ID=?", arrayOf(mediaInfo._id))
         }
         db.close()
+    }
+
+    fun getBooleanValue(isTrue: Boolean): Int {
+        return if (isTrue) {
+            1
+        } else {
+            0
+        }
     }
 
     private fun getMediaInfo(title: String): MediaInfo? {
@@ -174,33 +203,52 @@ class MediaDataHelper(
         var mediaInfo = MediaInfo()
         mediaInfo._id = cursor.getString(cursor.getColumnIndex(VALUE_ID))
         mediaInfo.title = cursor.getString(cursor.getColumnIndex(MEDIA_TITLE))
+        mediaInfo.area = cursor.getString(cursor.getColumnIndex(MEDIA_AREA))
+        mediaInfo.year = cursor.getString(cursor.getColumnIndex(MEDIA_YEAR))
         mediaInfo.image = cursor.getString(cursor.getColumnIndex(MEDIA_IMAGE_URL))
         mediaInfo.url = cursor.getString(cursor.getColumnIndex(MEDIA_PAGE_URL))
         mediaInfo.type = MediaType.valueOf(cursor.getString(cursor.getColumnIndex(MEDIA_TYPE)))
+        mediaInfo.subType = cursor.getString(cursor.getColumnIndex(MEDIA_SUB_TYPE))
+        mediaInfo.score = cursor.getString(cursor.getColumnIndex(MEDIA_SCORE))
+        mediaInfo.label = cursor.getString(cursor.getColumnIndex(MEDIA_LABEL))
         mediaInfo.describe = cursor.getString(cursor.getColumnIndex(MEDIA_DESCRIBE))
         mediaInfo.isHot = (1 == cursor.getInt(cursor.getColumnIndex(MEDIA_IS_HOT)))
+        mediaInfo.isTop = (1 == cursor.getInt(cursor.getColumnIndex(MEDIA_IS_Top)))
         return mediaInfo
     }
 
-    fun getAllMediaInfo(type: MediaType, isHot: Boolean): LinkedList<MediaInfo> {
+    fun getAllMediaInfo(mediaInfo: MediaInfo): LinkedList<MediaInfo> {
         //创建游标对象
         val listData = LinkedList<MediaInfo>()
-        //创建游标对象
-        var selection = "$MEDIA_TYPE=?"
-        var values = arrayOf(type.toString())
-        if (isHot) {
-            selection = "$MEDIA_TYPE=? and $MEDIA_IS_HOT=1"
+        var sql = StringBuilder("select * from $MEDIA_INFO_TABLE where ")
+        if (mediaInfo.type != MediaType.UnKnow) {
+            sql.append("$MEDIA_TYPE='${mediaInfo.type}' ")
         }
+
+        if (mediaInfo.subType.isNotEmpty()) {
+            sql.append("and $MEDIA_SUB_TYPE='${mediaInfo.subType}' ")
+        }
+
+        if (mediaInfo.area.isNotEmpty()) {
+            sql.append("and $MEDIA_AREA='${mediaInfo.area}' ")
+        }
+
+        if (mediaInfo.year.isNotEmpty()) {
+            sql.append("and $MEDIA_YEAR='${mediaInfo.year}' ")
+        }
+
+        if (mediaInfo.isHot) {
+            sql.append("and $MEDIA_IS_HOT=1 ")
+        }
+        if (mediaInfo.isTop) {
+            sql.append("and $MEDIA_IS_Top=1 ")
+        }
+
+        sql.append("ORDER BY $MEDIA_UPDATE_TIME DESC,_id desc")
+        //创建游标对象
+
         val cursor =
-            writableDatabase.query(
-                MEDIA_INFO_TABLE,
-                null,
-                selection,
-                values,
-                null,
-                null,
-                null
-            )
+            writableDatabase.rawQuery(sql.toString(), null)
         while (cursor.moveToNext()) {
             val mediaInfo = toMediaInfo(cursor)
             listData.add(mediaInfo)

@@ -6,7 +6,9 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import com.agile.mycinema.Constant.Companion.MEDIA_WIDTH_HEIGHT_SCALE
+import com.agile.mycinema.utils.Constant
+import com.agile.mycinema.utils.Constant.Companion.MEDIA_WIDTH_HEIGHT_SCALE
+import com.agile.mycinema.utils.PaintUtil
 import com.bumptech.glide.Glide
 
 class MediaItemView(context: Context) : FrameLayout(context), ISelectListener {

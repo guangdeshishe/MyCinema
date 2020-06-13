@@ -1,4 +1,4 @@
-package com.agile.mycinema
+package com.agile.mycinema.moremedia
 
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
@@ -8,13 +8,16 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.AdapterView
+import android.widget.GridView
+import com.agile.mycinema.ISelectListener
 import com.agile.mycinema.utils.Constant
 
-class MediaGridView(context: Context?, attrs: AttributeSet?) : WrapHeightGridView(context, attrs),
+class MediaMoreGridView(context: Context?, attrs: AttributeSet?) : GridView(context, attrs),
     AdapterView.OnItemSelectedListener {
     var sourceWidth = 0
     var sourceHeight = 0
     var lastSelectedView: ISelectListener? = null
+    var mListener: AdapterView.OnItemSelectedListener? = null
 
     init {
         onItemSelectedListener = this
@@ -46,6 +49,7 @@ class MediaGridView(context: Context?, attrs: AttributeSet?) : WrapHeightGridVie
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         handleItemSelect(view)
+        mListener?.onItemSelected(parent, view, position, id)
     }
 
     private fun handleItemSelect(view: View?) {

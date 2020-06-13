@@ -1,9 +1,12 @@
-package com.agile.mycinema
+package com.agile.mycinema.utils
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.View
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.agile.mycinema.R
 
 class PaintUtil(_view: View) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -43,4 +46,18 @@ class PaintUtil(_view: View) {
             paint
         )
     }
+
+    companion object {
+        fun handleTextSelected(view: TextView, isSelected: Boolean) {
+            if (isSelected) {
+                view.setBackgroundColor(Color.parseColor("#ffffff"))
+                view.setTextColor(ContextCompat.getColor(view.context, R.color.colorTheme))
+            } else {
+                view.setBackgroundColor(Color.TRANSPARENT)
+                view.setTextColor(ContextCompat.getColor(view.context, R.color.colorTitle))
+            }
+        }
+    }
+
+
 }

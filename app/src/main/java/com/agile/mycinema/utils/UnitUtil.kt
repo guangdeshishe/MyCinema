@@ -1,4 +1,4 @@
-package com.agile.mycinema
+package com.agile.mycinema.utils
 
 import android.content.Context
 

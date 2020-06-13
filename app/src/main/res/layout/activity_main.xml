@@ -2,9 +2,9 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/colorTheme"
-    android:padding="5dp"
-    android:layout_height="match_parent">
+    android:padding="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,13 +16,15 @@
             android:id="@+id/mSuggestMediaTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="推荐影视" />
+            android:text="推荐影视"
+            android:visibility="gone" />
 
         <com.agile.mycinema.MediaGridView
             android:id="@+id/mSuggestMediaGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:numColumns="6" />
+            android:numColumns="6"
+            android:visibility="gone" />
 
         <com.agile.mycinema.CommonTextView
             android:id="@+id/mHotMovieTitle"
@@ -40,10 +42,34 @@
             android:id="@+id/mHotTVTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="热播电视剧" />
+            android:text="热播电视" />
 
         <com.agile.mycinema.MediaGridView
             android:id="@+id/mHotTVGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="6" />
+
+        <com.agile.mycinema.CommonTextView
+            android:id="@+id/mHotTVShowTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="热播综艺" />
+
+        <com.agile.mycinema.MediaGridView
+            android:id="@+id/mHotTVShowGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="6" />
+
+        <com.agile.mycinema.CommonTextView
+            android:id="@+id/mHotMicroMovieTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="微电影" />
+
+        <com.agile.mycinema.MediaGridView
+            android:id="@+id/mHotMicroMovieGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:numColumns="6" />

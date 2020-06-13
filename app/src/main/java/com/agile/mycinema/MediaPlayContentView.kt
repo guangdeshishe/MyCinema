@@ -11,6 +11,8 @@ import android.view.KeyEvent
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
+import com.agile.mycinema.utils.Constant
+import com.agile.mycinema.utils.PaintUtil
 import kotlinx.android.synthetic.main.media_player_content_view.view.*
 
 class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),

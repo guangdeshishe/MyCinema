@@ -79,7 +79,7 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     fun show(timeout: Long) {
         visibility = View.VISIBLE
         updateProgress()
-        if (mUpdateThread == null) {
+//        if (mUpdateThread == null) {
             mUpdateThread = object : Thread() {
                 override fun run() {
                     try {
@@ -94,8 +94,13 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
                     }
                 }
             }
+//        }
+        try {
+            mUpdateThread?.start()
+        } catch (e: Throwable) {
+            e.printStackTrace()
         }
-        mUpdateThread?.start()
+
         mainHandler.removeMessages(1)
         mainHandler.sendEmptyMessageDelayed(1, timeout)
     }

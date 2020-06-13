@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
+import com.agile.mycinema.utils.PaintUtil
 import kotlinx.android.synthetic.main.grideview_media_item_view.view.*
 
 class PlayItemView(context: Context) : FrameLayout(context), ISelectListener {

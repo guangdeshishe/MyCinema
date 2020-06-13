@@ -9,15 +9,16 @@ import android.widget.AdapterView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.agile.mycinema.Constant.Companion.HOST
-import com.lzy.okgo.OkGo
-import com.lzy.okgo.callback.StringCallback
-import com.lzy.okgo.model.Response
+import com.agile.mycinema.moremedia.MoreMediaActivity
+import com.agile.mycinema.utils.Constant
+import com.agile.mycinema.utils.Constant.Companion.HOST
+import com.agile.mycinema.utils.UnitUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import java.util.*
 
 
 class MainActivity : BaseActivity(),
@@ -59,103 +60,147 @@ class MainActivity : BaseActivity(),
 
         mHotMovieAdapter = MediaGridAdapter(this)
         mHotMovieGridView.adapter = mHotMovieAdapter
+
         mHotTVAdapter = MediaGridAdapter(this)
         mHotTVGridView.adapter = mHotTVAdapter
-//        mHotCartoonAdapter = MediaGridAdapter(this)
-//        mHotMovieGridView.adapter = mHotCartoonAdapter
-//        mHotTvShowAdapter = MediaGridAdapter(this)
-//        mHotMovieGridView.adapter = mHotTvShowAdapter
-//        mHotMicroMovieAdapter = MediaGridAdapter(this)
-//        mHotMovieGridView.adapter = mHotMicroMovieAdapter
+
+        mHotTvShowAdapter = MediaGridAdapter(this)
+        mHotTVShowGridView.adapter = mHotTvShowAdapter
+
+        mHotMicroMovieAdapter = MediaGridAdapter(this)
+        mHotMicroMovieGridView.adapter = mHotMicroMovieAdapter
+
         mSuggestMediaGridView.onItemClickListener = this
         mHotMovieGridView.onItemClickListener = this
 
-        mHotTVGridView.onItemClickListener = this
+        mHotTVShowGridView.onItemClickListener = this
+        mHotMicroMovieGridView.onItemClickListener = this
 
         requestPermission()
     }
 
-    fun loadCacheData() {
-        var SuggestMedias = mMediaDataHelper.getAllMediaInfo(MediaType.Suggest, true)
-        var HotMovies = mMediaDataHelper.getAllMediaInfo(MediaType.MOVIE, true)
-        var HotTV = mMediaDataHelper.getAllMediaInfo(MediaType.TV, true)
-        if (HotMovies.size > 0) {
-            isLoadedCache = true
-            mSuggestMediaAdapter.initData(SuggestMedias)
-            mHotMovieAdapter.initData(HotMovies)
-            mHotTVAdapter.initData(HotTV)
-            mHotMovieGridView.postDelayed({ mSuggestMediaGridView.requestFocus() }, 500)
-        }
-    }
+//    fun loadCacheData() {
+//        var HotMovies =
+//            mMediaDataHelper.getAllMediaInfo(MediaInfo().type(MediaType.MOVIE).isHot(true))
+//        var HotTV = mMediaDataHelper.getAllMediaInfo(MediaInfo().type(MediaType.TV).isHot(true))
+//        if (HotMovies.size > 0) {
+//            isLoadedCache = true
+//            mHotMovieAdapter.initData(HotMovies)
+//            mHotTVAdapter.initData(HotTV)
+//            mHotMovieGridView.postDelayed({ mHotMovieGridView.requestFocus() }, 500)
+//        }
+//    }
 
     fun initView() {
-        loadCacheData()
-//        showToast("后台正在更新网络数据")
-        var host = HOST
-        OkGo.get<String>(host)
-            .tag(this)
-            .cacheKey("cacheKey1")            // 设置当前请求的缓存key,建议每个不同功能的请求设置一个
-            .execute(object : StringCallback() {
-                override fun onSuccess(response: Response<String>) {
-                    val result = response.body()
-                    val doc: Document = Jsoup.parse(result)
-                    log(doc.title())
-//                    Toast.makeText(this@MainActivity, "" + doc.title(), Toast.LENGTH_LONG).show()
-                    val ulElements: Elements = doc.select("ul")
-                    var index = 0;
-                    for (ulElement in ulElements) {
-                        val ulDoc: Document = Jsoup.parse(ulElement.html())
-                        val liElements: Elements = ulDoc.select("li")
-                        var type = MediaType.MOVIE;
-                        if (liElements.size == 0) {
-                            continue
-                        }
-                        var isOk = true;
-                        for (lisHtml in liElements) {
-                            val liDoc: Document = Jsoup.parse(lisHtml.html())
-                            val linkElements: Elements = liDoc.select("a[href]")
-                            val imageElements: Elements = liDoc.select("img[src]")
-                            if (linkElements.size == 0 || imageElements.size == 0) {
-                                isOk = false
-                                break
-                            }
-                            val linkItem: Element = linkElements[0]
-                            val imageItem: Element = imageElements[0]
-                            var title = linkItem.attr("title")
-                            var imageUrl = imageItem.attr("src")
-                            if (index == 0) {//顶部轮播
-                                imageUrl = imageItem.attr("data-src")
-                                title = liDoc.select("em")[0].text()
-                            }
-                            val mediaUrl = host + linkItem.attr("href")
+        loadPageData(HOST)
 
-                            var mediaInfo = MediaInfo(type, title, imageUrl, mediaUrl, title, true)
-                            addMedia(index, mediaInfo);
-                        }
-                        if (isOk) {
-                            index++;
-                        }
-                    }
-//                    if(!isLoadedCache){
-//                        showToast("在线读取数据成功")
-                    loadCacheData()
-//                    }
-
-                }
-
-                override fun onError(response: Response<String>) {
-                    super.onError(response)
-                    Toast.makeText(this@MainActivity, "" + response.message(), Toast.LENGTH_LONG)
-                        .show()
-                }
-            })
     }
 
-    fun addMedia(index: Int, media: MediaInfo) {
+    override fun onLoadPageDataSuccess(content: String, action: Int, obj: Any?) {
+        val doc: Document = Jsoup.parse(content)
+        log(doc.title())
+        val ulElements: Elements = doc.select("ul")
+        var index = 0;
+
+        val titleElements = doc.select("div.modo_title")
+        for (titleElement in titleElements) {
+            val aElement = titleElement.select("a[href]")[0]
+            val titleName = aElement.attr("title")
+            val url = HOST + aElement.attr("href")
+            if ("电影" == titleName) {
+                mHotMovieTitle.text = aElement.text()
+                mHotMovieTitle.setOnClickListener {
+                    MoreMediaActivity.open(
+                        this,
+                        MediaInfo().type(MediaType.MOVIE).url(url)
+                    )
+                }
+            } else if ("电视剧" == titleName) {
+                mHotTVTitle.text = aElement.text()
+                mHotTVTitle.setOnClickListener {
+                    MoreMediaActivity.open(
+                        this,
+                        MediaInfo().type(MediaType.TV).url(url)
+                    )
+                }
+            } else if ("综艺" == titleName) {
+                mHotTVShowTitle.text = aElement.text()
+                mHotTVShowTitle.setOnClickListener {
+                    MoreMediaActivity.open(
+                        this,
+                        MediaInfo().type(MediaType.TVSHOW).url(url)
+                    )
+                }
+            } else if ("微电影" == titleName) {
+                mHotMicroMovieTitle.text = aElement.text()
+                mHotMicroMovieTitle.setOnClickListener {
+                    MoreMediaActivity.open(
+                        this,
+                        MediaInfo().type(MediaType.MicroMovie).url(url)
+                    )
+                }
+            }
+        }
+
+        var movieDatas = LinkedList<MediaInfo>()
+        var tvDatas = LinkedList<MediaInfo>()
+        var tvShowDatas = LinkedList<MediaInfo>()
+        var microMovieDatas = LinkedList<MediaInfo>()
+        for (ulElement in ulElements) {
+
+            val ulDoc: Document = Jsoup.parse(ulElement.html())
+            val liElements: Elements = ulDoc.select("li")
+            if (liElements.size == 0) {
+                continue
+            }
+            var isOk = true;
+            for (lisHtml in liElements) {
+                val liDoc: Document = Jsoup.parse(lisHtml.html())
+                val linkElements: Elements = liDoc.select("a[href]")
+                val imageElements: Elements = liDoc.select("img[src]")
+                if (linkElements.size == 0 || imageElements.size == 0) {
+                    isOk = false
+                    break
+                }
+                val linkItem: Element = linkElements[0]
+                val imageItem: Element = imageElements[0]
+                var title = linkItem.attr("title")
+                var imageUrl = imageItem.attr("src")
+                if (index == 0) {//顶部轮播
+                    imageUrl = imageItem.attr("data-src")
+                    title = liDoc.select("em")[0].text()
+                }
+                val mediaUrl = Constant.HOST + linkItem.attr("href")
+
+                var mediaInfo =
+                    MediaInfo().title(title).image(imageUrl).url(mediaUrl)
+                        .title(title).isHot(true)
+                val type = updateMediaType(index, mediaInfo);
+
+                when (type) {
+                    MediaType.MOVIE -> movieDatas.add(mediaInfo)
+                    MediaType.TV -> tvDatas.add(mediaInfo)
+                    MediaType.TVSHOW -> tvShowDatas.add(mediaInfo)
+                    MediaType.MicroMovie -> microMovieDatas.add(mediaInfo)
+                }
+            }
+            if (isOk) {
+                index++;
+            }
+        }
+        mHotMovieAdapter.initData(filterRepeatMedia(movieDatas))
+        mHotTVAdapter.initData(filterRepeatMedia(tvDatas))
+        mHotTvShowAdapter.initData(tvShowDatas)
+        mHotMicroMovieAdapter.initData(microMovieDatas)
+
+    }
+
+    fun updateMediaType(index: Int, media: MediaInfo): MediaType {
         when (index) {
             0 -> {
                 log("===轮播数据=== $media")
-                media.type = MediaType.Suggest
+                return MediaType.UnKnow
+
             }
             1 -> {
                 log("===热播电影=== $media")
@@ -186,7 +231,7 @@ class MainActivity : BaseActivity(),
                 media.type = MediaType.MicroMovie
             }
         }
-        mMediaDataHelper.updateMediaInfo(media)
+        return media.type
     }
 
     override fun onRequestPermissionsResult(
@@ -232,14 +277,22 @@ class MainActivity : BaseActivity(),
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         var mediaInfo: MediaInfo? = null
-        if (parent == mSuggestMediaGridView) {
-            mediaInfo = mSuggestMediaAdapter.getItem(position) as MediaInfo
-
-        } else if (parent == mHotMovieGridView) {
-            mediaInfo = mHotMovieAdapter.getItem(position) as MediaInfo
-
-        } else if (parent == mHotTVGridView) {
-            mediaInfo = mHotTVAdapter.getItem(position) as MediaInfo
+        when (parent) {
+            mSuggestMediaGridView -> {
+                mediaInfo = mSuggestMediaAdapter.getItem(position) as MediaInfo
+            }
+            mHotMovieGridView -> {
+                mediaInfo = mHotMovieAdapter.getItem(position) as MediaInfo
+            }
+            mHotTVGridView -> {
+                mediaInfo = mHotTVAdapter.getItem(position) as MediaInfo
+            }
+            mHotTVShowGridView -> {
+                mediaInfo = mHotTvShowAdapter.getItem(position) as MediaInfo
+            }
+            mHotMicroMovieGridView -> {
+                mediaInfo = mHotMicroMovieAdapter.getItem(position) as MediaInfo
+            }
         }
         MediaDetailActivity.open(this@MainActivity, mediaInfo)
     }

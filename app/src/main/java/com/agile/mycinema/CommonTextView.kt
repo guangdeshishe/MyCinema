@@ -4,8 +4,9 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.util.AttributeSet
+import com.agile.mycinema.utils.PaintUtil
 
-class CommonTextView(context: Context, attrs: AttributeSet?) :
+open class CommonTextView(context: Context, attrs: AttributeSet?) :
     androidx.appcompat.widget.AppCompatTextView(context, attrs) {
     var paintUtil = PaintUtil(this)
     var fontSize = 15f;
