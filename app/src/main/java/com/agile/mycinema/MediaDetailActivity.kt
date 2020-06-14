@@ -80,6 +80,7 @@ class MediaDetailActivity : BaseActivity() {
             playUrl = playUrl.substring(index + 1, playUrl.length)
             log(playInfo.summary + " m3u8-> " + playUrl)
             playInfo.videoUrl = playUrl
+            showToast(playUrl)
             mMediaPlayerContentView.setVideoURI(playUrl, playInfo.summary)
             return
         }

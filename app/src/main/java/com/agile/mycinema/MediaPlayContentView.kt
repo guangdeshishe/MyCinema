@@ -38,14 +38,15 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
 //        addView(mediaNameView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
 
 //        mMediaPlayer.setMediaController(mMediaController)
-        mMediaController.mMediaPlayer = mMediaPlayer
+
+        mMyMediaController.mMediaPlayer = mMediaPlayer
         mMediaPlayer.setOnPreparedListener(this);
         setOnClickListener {
             if (isFullScreen) {
-                if (mMediaController.isShowing()) {
-                    mMediaController.handlePause()
+                if (mMyMediaController.isShowing()) {
+                    mMyMediaController.handlePause()
                 } else {
-                    mMediaController.show()
+                    mMyMediaController.show()
 
                 }
             } else {
@@ -107,7 +108,7 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
 
     override fun onPrepared(mp: MediaPlayer?) {
         mMediaPlayer.start()
-        mMediaController.show()
+        mMyMediaController.show()
     }
 
     fun switchFullScreen(fullScreen: Boolean) {
@@ -171,20 +172,20 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
                 if (event?.action == KeyEvent.ACTION_DOWN) {
 
 //                    showToast("开始长按右键" + event?.getRepeatCount())
-                    mMediaController.progressForward()
+                    mMyMediaController.progressForward()
                 } else if (event?.action == KeyEvent.ACTION_UP) {
 //                    showToast("结束长按右键")
-                    mMediaController.resetSpeed()
+                    mMyMediaController.resetSpeed()
                 }
                 return true
             } else if (keyCode == 21) {
                 if (event?.action == KeyEvent.ACTION_DOWN) {
 
 //                    showToast("开始长按左键" + event?.getRepeatCount())
-                    mMediaController.progressBack()
+                    mMyMediaController.progressBack()
                 } else if (event?.action == KeyEvent.ACTION_UP) {
 //                    showToast("结束长按左键")
-                    mMediaController.resetSpeed()
+                    mMyMediaController.resetSpeed()
                 }
                 return true
             } else if (keyCode == 19) {
