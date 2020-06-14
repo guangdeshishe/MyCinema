@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.agile.mycinema.utils.Constant
@@ -34,22 +35,14 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
     init {
         inflate(context, R.layout.media_player_content_view, this)
         mExoPlayer.player = player
+
         isFocusable = true
 
         mMyMediaController.mMediaPlayer = player
         mMyMediaController.mController = mExoPlayer
 
         setOnClickListener {
-            if (isFullScreen) {
-                if (mMyMediaController.isShowing()) {
-                    mMyMediaController.handlePause()
-                } else {
-                    mMyMediaController.show()
-
-                }
-            } else {
-                switchFullScreen(true)
-            }
+            handleTouchOrClick()
         }
 
         post {
@@ -57,6 +50,19 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
         }
 
 
+    }
+
+    fun handleTouchOrClick() {
+        if (isFullScreen) {
+            if (mMyMediaController.isShowing()) {
+                mMyMediaController.handlePause()
+            } else {
+                mMyMediaController.show()
+
+            }
+        } else {
+            switchFullScreen(true)
+        }
     }
 
     /**
@@ -166,6 +172,13 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
 
     fun log(message: String) {
         Log.d("agilelog", message)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.action == MotionEvent.ACTION_DOWN && !isFullScreen) {
+            handleTouchOrClick()
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {

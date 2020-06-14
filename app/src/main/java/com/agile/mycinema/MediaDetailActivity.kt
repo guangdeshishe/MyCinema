@@ -47,7 +47,15 @@ class MediaDetailActivity : BaseActivity() {
             mDescribeFullContextView.visibility = View.VISIBLE
             mDescribeFullContextView.requestFocus()
         }
+        mDescribeView.setOnClickListener {
+            mDescribeFullContextView.visibility = View.VISIBLE
+            mDescribeFullContextView.requestFocus()
+        }
         mDescribeFullContextView.setOnClickListener {
+            mDescribeFullContextView.visibility = View.GONE
+            mTitleDescribeView.requestFocus()
+        }
+        mDescribeFullView.setOnClickListener {
             mDescribeFullContextView.visibility = View.GONE
             mTitleDescribeView.requestFocus()
         }
@@ -193,7 +201,7 @@ class MediaDetailActivity : BaseActivity() {
 
     override fun onDestroy() {
         mMediaPlayerContentView.stopPlayback()
-        super.onStop()
+        super.onDestroy()
     }
 
     override fun onResume() {
