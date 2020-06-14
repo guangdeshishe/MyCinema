@@ -23,6 +23,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     companion object {
         const val ACTION_MAIN = 0//加载主界面数据
+        const val ACTION_LOAD_BACKGROUND = -100//异步在线更新数据，供下次加载最新数据
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +40,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun loadPageData(url: String, action: Int, obj: Any?) {
+        log("loadPageData:$url")
         val content = loadCacheData(url)
         if (content.isNullOrEmpty()) {
             loadDataOnline(url, action, obj)
@@ -46,6 +48,8 @@ abstract class BaseActivity : AppCompatActivity() {
         }
         onLoadPageDataSuccess(content, action, obj)
         onLoadPageDataFinished(true)
+        //异步获取网页最新数缓存到本地
+        loadDataOnline(url, ACTION_LOAD_BACKGROUND, obj)
     }
 
     private fun loadDataOnline(url: String, action: Int, obj: Any?) {
@@ -55,15 +59,19 @@ abstract class BaseActivity : AppCompatActivity() {
             .execute(object : StringCallback() {
                 override fun onSuccess(response: Response<String>) {
                     val result = response.body()
-                    onLoadPageDataSuccess(result, action, obj)
                     saveCacheFile(url, result)//将数据缓存到本地文件中
-                    onLoadPageDataFinished(true)
+                    if (action != ACTION_LOAD_BACKGROUND) {
+                        onLoadPageDataSuccess(result, action, obj)
+                        onLoadPageDataFinished(true)
+                    }
                 }
 
                 override fun onError(response: Response<String>) {
                     super.onError(response)
-                    onLoadPageDataFinished(false)
-                    showToast("" + response.message())
+                    if (action != ACTION_LOAD_BACKGROUND) {
+                        onLoadPageDataFinished(false)
+                        showToast("" + response.message())
+                    }
                 }
             })
     }

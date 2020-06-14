@@ -4,15 +4,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.agile.mycinema.MediaGridAdapter
 import com.agile.mycinema.utils.LogUtil
+import com.agile.mycinema.utils.UnitUtil
 import java.util.*
 
 class MediaTypeListView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
     val mDatas = LinkedList<SubMediaType>()
     var mCurrentSelectPosition = 0//默认选中第一个
-    lateinit var mMediaDataAdapter: MediaGridAdapter
     var mMediaTypeClickListener: MediaTypeClickListener? = null
 
     init {
@@ -24,7 +23,9 @@ class MediaTypeListView(context: Context?, attrs: AttributeSet?) : LinearLayout(
     }
 
     fun initData(mediaTypes: LinkedList<SubMediaType>) {
+        mCurrentSelectPosition = 0
         mDatas.clear()
+        removeAllViews()
         mDatas.addAll(mediaTypes)
         updateView()
     }
@@ -38,6 +39,10 @@ class MediaTypeListView(context: Context?, attrs: AttributeSet?) : LinearLayout(
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             layoutParams.gravity = Gravity.CENTER
+            val margin = UnitUtil.dp2px(context, 1f)
+            layoutParams.setMargins(
+                0, margin, 0, margin
+            )
             var textView = SelectableTextView(context, mediaType.mediaType)
             if (position == 0) {
                 textView.changeSelected(true)
@@ -53,17 +58,19 @@ class MediaTypeListView(context: Context?, attrs: AttributeSet?) : LinearLayout(
             }
             addView(textView, layoutParams)
 
-            if (position == 0) {
+            if (!mediaType.isSubType && position == 0) {
                 mMediaTypeClickListener?.onMediaTypeClick(position, mediaType)
             }
         }
-
     }
 
     fun getCurrentMediaType(): SubMediaType {
         return mDatas[mCurrentSelectPosition]
     }
 
+    fun isDataEmpty(): Boolean {
+        return mDatas.size == 0
+    }
 
     fun log(message: String) {
         LogUtil.log(message)

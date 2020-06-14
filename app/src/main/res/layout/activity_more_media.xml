@@ -12,7 +12,19 @@
 
         <com.agile.mycinema.moremedia.MediaTypeListView
             android:id="@+id/mMediaTypeContentView"
-            android:layout_width="match_parent"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+
+    <ScrollView
+        android:id="@+id/mMediaSubTypeMainContentView"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="1dp"
+        android:layout_height="match_parent">
+
+        <com.agile.mycinema.moremedia.MediaTypeListView
+            android:id="@+id/mMediaSubTypeContentView"
+            android:layout_width="60dp"
             android:layout_height="wrap_content" />
     </ScrollView>
 

@@ -57,6 +57,7 @@ class MediaDetailActivity : BaseActivity() {
         mAdapter = PlayGridAdapter(this)
         mPlayGridView.adapter = mAdapter
 
+        log("detailPage: " + mMediaInfo.url)
         loadPageData(mMediaInfo.url, ACTION_MAIN)//加载网页数据
 
         mPlayGridView.onItemClickListener =

@@ -1,6 +1,6 @@
 package com.agile.mycinema.moremedia
 
-class SubMediaType(var mediaType: String, var url: String) {
+class SubMediaType(var mediaType: String, var url: String, var isSubType: Boolean) {
     var nextPageUrl = "" //下一页链接
     var nextPage = DEFAULT_NEXT_PAGE
 

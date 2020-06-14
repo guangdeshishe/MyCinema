@@ -72,7 +72,7 @@ class MainActivity : BaseActivity(),
 
         mSuggestMediaGridView.onItemClickListener = this
         mHotMovieGridView.onItemClickListener = this
-
+        mHotTVGridView.onItemClickListener = this
         mHotTVShowGridView.onItemClickListener = this
         mHotMicroMovieGridView.onItemClickListener = this
 
@@ -192,6 +192,7 @@ class MainActivity : BaseActivity(),
         mHotTVAdapter.initData(filterRepeatMedia(tvDatas))
         mHotTvShowAdapter.initData(tvShowDatas)
         mHotMicroMovieAdapter.initData(microMovieDatas)
+        mHotMovieGridView.postDelayed({ mHotMovieTitle.requestFocus() }, 500)
 
     }
 

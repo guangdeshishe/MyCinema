@@ -52,8 +52,8 @@ class MoreMediaActivity : BaseActivity(),
         mMediaDataGridView.onItemClickListener = this
         mMediaDataGridView.setOnScrollListener(this)
 
-        mMediaTypeContentView.mMediaDataAdapter = mMediaDataAdapter
         mMediaTypeContentView.mMediaTypeClickListener = this
+        mMediaSubTypeContentView.mMediaTypeClickListener = this
 
         mMediaDataGridView.mListener = this
         initView()
@@ -69,7 +69,9 @@ class MoreMediaActivity : BaseActivity(),
         if (action == ACTION_ITEM_CLICK || action == ACTION_LOAD_MORE) {//点击分类/加载更多
             val mediaType = obj as SubMediaType
 
-            if (mMediaTypeContentView.getCurrentMediaType() != mediaType) {//返回的数据不是当前分类下的
+            if (mMediaTypeContentView.getCurrentMediaType() != mediaType
+                && (mMediaSubTypeContentView.isDataEmpty() || mMediaSubTypeContentView.getCurrentMediaType() != mediaType)
+            ) {//返回的数据不是当前分类下的
                 return
             }
 
@@ -119,7 +121,31 @@ class MoreMediaActivity : BaseActivity(),
             if (action == ACTION_LOAD_MORE) {//加载更多
                 mMediaDataAdapter.addData(mediaDatas)
             } else {//初始化数据
+                if (!mediaType.isSubType) {
+                    //最新、热门、评分
+                    val subMediaType = LinkedList<SubMediaType>()
+                    val subTitleElements = doc.select("div.list_ico a[href]")
+                    for (aElement in subTitleElements) {
+                        val title = aElement.text()
+                        val titleName = title.substring(1, title.length)
+                        val url = Constant.HOST + aElement.attr("href")
+                        subMediaType.add(SubMediaType(titleName, url, true))
+                    }
+
+                    mMediaSubTypeContentView.initData(subMediaType)
+                    if (subMediaType.size > 0) {
+                        mMediaSubTypeMainContentView.visibility = View.VISIBLE
+//                        mMediaSubTypeContentView.loadFirst()
+                    } else {
+                        mMediaSubTypeMainContentView.visibility = View.GONE
+                    }
+                }
+
                 mMediaDataAdapter.initData(mediaDatas)
+                mMediaDataGridView.postDelayed({
+                    mMediaDataGridView.requestFocus()
+                    mMediaDataGridView.scrollTo(0, 0)
+                }, 500)
             }
             return
         }
@@ -128,22 +154,30 @@ class MoreMediaActivity : BaseActivity(),
         val titleElements = doc.select("div.modo_title")
         val mediaTypes = LinkedList<SubMediaType>()
         when (mMediaInfo.type) {
-            MediaType.MOVIE -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_URL))
-            MediaType.TV -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_TV_URL))
-            MediaType.TVSHOW -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_TV_SHOW_URL))
-            MediaType.MicroMovie -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_Micro_Movie_URL))
+            MediaType.MOVIE -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_URL, false))
+            MediaType.TV -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_TV_URL, false))
+            MediaType.TVSHOW -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_TV_SHOW_URL, false))
+            MediaType.MicroMovie -> mediaTypes.add(
+                SubMediaType(
+                    "排行榜",
+                    MEDIA_TOP_Micro_Movie_URL,
+                    false
+                )
+            )
         }
 
         for (titleElement in titleElements) {
             val aElement = titleElement.select("a[href]")
             val titleName = aElement.attr("title")
             val url = Constant.HOST + aElement.attr("href")
-            mediaTypes.add(SubMediaType(titleName, url))
+            mediaTypes.add(SubMediaType(titleName, url, false))
         }
+
         mMediaTypeContentView.initData(mediaTypes)
     }
 
     fun initView() {
+        log("initView")
         loadPageData(mMediaInfo.url)
     }
 
@@ -164,6 +198,7 @@ class MoreMediaActivity : BaseActivity(),
         }
         mediaType.resetNextPage()
         mMediaDataAdapter.clear()
+        log("onMediaTypeClick:$position")
         loadPageData(mediaType.url, ACTION_ITEM_CLICK, mediaType)
     }
 
