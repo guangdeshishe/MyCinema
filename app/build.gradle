@@ -11,6 +11,11 @@ android {
         experimental = true
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId "com.agile.mycinema"
         minSdkVersion 21
@@ -75,4 +80,5 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.lzy.net:okgo:3.0.4'
     implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.11.5'
 }

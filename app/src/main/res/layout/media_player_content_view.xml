@@ -8,6 +8,13 @@
         android:id="@+id/mMediaPlayer"
         android:layout_width="match_parent"
         android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_height="wrap_content" />
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/mExoPlayer"
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
         android:layout_height="wrap_content" />
 
     <TextView

@@ -194,7 +194,7 @@ class MediaDetailActivity : BaseActivity() {
         super.onPause()
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         mMediaPlayerContentView.stopPlayback()
         super.onStop()
     }

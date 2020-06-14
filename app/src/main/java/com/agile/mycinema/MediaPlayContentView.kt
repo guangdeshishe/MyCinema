@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
@@ -13,7 +14,18 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import com.agile.mycinema.utils.Constant
 import com.agile.mycinema.utils.PaintUtil
+import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.TrackSelection
+import com.google.android.exoplayer2.trackselection.TrackSelector
+import com.google.android.exoplayer2.upstream.BandwidthMeter
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.media_player_content_view.view.*
+
 
 class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
     MediaPlayer.OnPreparedListener {
@@ -26,9 +38,25 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
     var isFullScreen = false
     var mediaName = ""
 
+    // step1. 创建一个默认的TrackSelector
+    var mainHandler: Handler = Handler()
+
+    // 创建带宽
+    var bandwidthMeter: BandwidthMeter = DefaultBandwidthMeter()
+
+    // 创建轨道选择工厂
+    var videoTrackSelectionFactory: TrackSelection.Factory =
+        AdaptiveTrackSelection.Factory(bandwidthMeter)
+
+    // 创建轨道选择器实例
+    var trackSelector: TrackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
+
+    //step2. 创建播放器
+    var player = ExoPlayerFactory.newSimpleInstance(context, trackSelector)
 
     init {
         inflate(context, R.layout.media_player_content_view, this)
+        mExoPlayer.player = player
         isFocusable = true
 //        mediaNameView.setTextColor(Color.WHITE)
 //        var padding = 10
@@ -39,7 +67,9 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
 
 //        mMediaPlayer.setMediaController(mMediaController)
 
-        mMyMediaController.mMediaPlayer = mMediaPlayer
+//        mMyMediaController.mMediaPlayer = mMediaPlayer
+        mMyMediaController.mMediaPlayer = player
+        mMyMediaController.mController = mExoPlayer
         mMediaPlayer.setOnPreparedListener(this);
         setOnClickListener {
             if (isFullScreen) {
@@ -67,20 +97,37 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
      * @param uri the URI of the video.
      */
     fun setVideoURI(url: String, title: String) {
-        mMediaPlayer.setVideoURI(Uri.parse(url))
+//        mMediaPlayer.setVideoURI(Uri.parse(url))
+
+        // 创建加载数据的工厂
+
+        // 创建加载数据的工厂
+        val dataSourceFactory =
+            DefaultDataSourceFactory(context, Util.getUserAgent(context, "MyApplication"), null)
+        val uri = Uri.parse(url)
+
+        val mediaSource =
+            HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
+
+        player.prepare(mediaSource)
+        player.playWhenReady = true
+
         var fullTitle = "$mediaName    $title"
         mediaNameView.text = fullTitle
     }
 
     fun stopPlayback() {
+        player.release()
         mMediaPlayer.stopPlayback()
     }
 
     fun pause() {
+        player.playWhenReady = false
         mMediaPlayer.pause()
     }
 
     fun resume() {
+        player.playWhenReady = true
         mMediaPlayer.start()
     }
 
@@ -89,7 +136,6 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
             switchFullScreen(false)
             return true
         }
-        stopPlayback()
         return false
     }
 

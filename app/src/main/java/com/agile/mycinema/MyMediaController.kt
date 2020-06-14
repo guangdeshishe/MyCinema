@@ -8,14 +8,16 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.SeekBar
-import android.widget.VideoView
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.android.synthetic.main.my_media_controller_view.view.*
 import java.lang.ref.WeakReference
 import java.util.*
 
 class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
     SeekBar.OnSeekBarChangeListener {
-    lateinit var mMediaPlayer: VideoView
+    lateinit var mMediaPlayer: SimpleExoPlayer
+    lateinit var mController: PlayerView
 
     private val DEFAULT_SPEED = 10 * 1000//默认快进速度10秒
     var speed = DEFAULT_SPEED
@@ -61,15 +63,15 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
         show()
         if (mMediaPlayer.isPlaying) {
             (mPlayControllerPause as ImageView).setImageResource(R.drawable.ic_media_controller_play)
-            mMediaPlayer.pause()
+            mMediaPlayer.playWhenReady = false
         } else {
             (mPlayControllerPause as ImageView).setImageResource(R.drawable.ic_media_controller_pause)
-            mMediaPlayer.start()
+            mMediaPlayer.playWhenReady = true
         }
     }
 
     fun isShowing(): Boolean {
-        return visibility == View.VISIBLE
+        return mController.isControllerVisible
     }
 
     fun show() {
@@ -77,39 +79,39 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     }
 
     fun show(timeout: Long) {
-        visibility = View.VISIBLE
-        updateProgress()
-//        if (mUpdateThread == null) {
-            mUpdateThread = object : Thread() {
-                override fun run() {
-                    try {
-                        while (mMediaPlayer.isPlaying && isShowing()) {
-                            // 如果正在播放，没0.5.毫秒更新一次进度条
-                            mainHandler.sendEmptyMessage(0)
-                            sleep(500)
-                        }
-                        mUpdateThread = null
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
+        mController.controllerShowTimeoutMs = timeout.toInt()
+        mController.showController()
+//        visibility = View.VISIBLE
+//        updateProgress()
+//        mUpdateThread = object : Thread() {
+//            override fun run() {
+//                try {
+//                    while (mMediaPlayer.isPlaying && isShowing()) {
+//                        // 如果正在播放，没0.5.毫秒更新一次进度条
+//                        mainHandler.sendEmptyMessage(0)
+//                        sleep(500)
+//                    }
+//                    mUpdateThread = null
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                }
+//            }
 //        }
-        try {
-            mUpdateThread?.start()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
-
-        mainHandler.removeMessages(1)
-        mainHandler.sendEmptyMessageDelayed(1, timeout)
+//        try {
+//            mUpdateThread?.start()
+//        } catch (e: Throwable) {
+//            e.printStackTrace()
+//        }
+//
+//        mainHandler.removeMessages(1)
+//        mainHandler.sendEmptyMessageDelayed(1, timeout)
     }
 
     fun updateProgress() {
         mCurrentTime.text = stringForTime(mMediaPlayer.currentPosition)
         mEndTime.text = stringForTime(mMediaPlayer.duration)
-        mPlayProgressView.max = mMediaPlayer.duration
-        mPlayProgressView.progress = mMediaPlayer.currentPosition
+        mPlayProgressView.max = mMediaPlayer.duration.toInt()
+        mPlayProgressView.progress = mMediaPlayer.currentPosition.toInt()
     }
 
     fun hide() {
@@ -117,7 +119,7 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     }
 
     //将长度转换为时间
-    private fun stringForTime(timeMs: Int): String? {
+    private fun stringForTime(timeMs: Long): String? {
         val totalSeconds = timeMs / 1000
         val seconds = totalSeconds % 60
         val minutes = totalSeconds / 60 % 60
@@ -132,7 +134,7 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         if (fromUser) {
-            mMediaPlayer.seekTo(progress)
+            mMediaPlayer.seekTo(progress.toLong())
         }
     }
 
@@ -145,8 +147,8 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     //前进
     fun progressForward() {
         show()
-        val position: Int = mMediaPlayer.currentPosition//当前时长
-        val duration: Int = mMediaPlayer.duration//总的时长
+        val position = mMediaPlayer.currentPosition//当前时长
+        val duration = mMediaPlayer.duration//总的时长
         var targetPosition = position + speed
         if (targetPosition > duration) {
             targetPosition = duration
@@ -162,8 +164,8 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     //后退
     fun progressBack() {
         show()
-        val position: Int = mMediaPlayer.currentPosition//当前时长
-        val duration: Int = mMediaPlayer.duration//总的时长
+        val position = mMediaPlayer.currentPosition//当前时长
+        val duration = mMediaPlayer.duration//总的时长
         var targetPosition = position - speed
         if (targetPosition < 0) {
             targetPosition = 0
