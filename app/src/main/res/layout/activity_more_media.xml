@@ -12,7 +12,7 @@
 
         <com.agile.mycinema.moremedia.MediaTypeListView
             android:id="@+id/mMediaTypeContentView"
-            android:layout_width="80dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content" />
     </ScrollView>
 
@@ -24,14 +24,15 @@
 
         <com.agile.mycinema.moremedia.MediaTypeListView
             android:id="@+id/mMediaSubTypeContentView"
-            android:layout_width="60dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content" />
     </ScrollView>
 
     <com.agile.mycinema.moremedia.MediaMoreGridView
         android:id="@+id/mMediaDataGridView"
         android:layout_width="match_parent"
+        android:layout_marginLeft="1dp"
         android:layout_height="match_parent"
-        android:numColumns="6" />
+        android:numColumns="5" />
     <!--    </ScrollView>-->
 </LinearLayout>

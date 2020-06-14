@@ -118,7 +118,7 @@ abstract class BaseActivity : AppCompatActivity() {
         file.writeText(content)
     }
 
-    fun getFullFilePath(key: String): String {
+    private fun getFullFilePath(key: String): String {
         return filesDir.absolutePath + File.separator + key
     }
 

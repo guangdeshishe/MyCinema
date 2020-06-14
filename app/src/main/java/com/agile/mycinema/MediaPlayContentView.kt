@@ -3,74 +3,42 @@ package com.agile.mycinema
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
-import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.Toast
 import com.agile.mycinema.utils.Constant
 import com.agile.mycinema.utils.PaintUtil
-import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.source.BaseMediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.trackselection.TrackSelection
-import com.google.android.exoplayer2.trackselection.TrackSelector
-import com.google.android.exoplayer2.upstream.BandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.media_player_content_view.view.*
 
 
-class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
-    MediaPlayer.OnPreparedListener {
+class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
 
     var paintUtil = PaintUtil(this)
 
-    //    var mMediaPlayer = VideoView(context, attrs)
-//    var mediaNameView = TextView(context, attrs)
-//    var mMediaController = MediaController(context)
     var isFullScreen = false
     var mediaName = ""
 
-    // step1. 创建一个默认的TrackSelector
-    var mainHandler: Handler = Handler()
+    var player = MyMediaController.getExoPlayer(context)
 
-    // 创建带宽
-    var bandwidthMeter: BandwidthMeter = DefaultBandwidthMeter()
+    var mMyMediaController = MyMediaController()
 
-    // 创建轨道选择工厂
-    var videoTrackSelectionFactory: TrackSelection.Factory =
-        AdaptiveTrackSelection.Factory(bandwidthMeter)
-
-    // 创建轨道选择器实例
-    var trackSelector: TrackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
-
-    //step2. 创建播放器
-    var player = ExoPlayerFactory.newSimpleInstance(context, trackSelector)
 
     init {
         inflate(context, R.layout.media_player_content_view, this)
         mExoPlayer.player = player
         isFocusable = true
-//        mediaNameView.setTextColor(Color.WHITE)
-//        var padding = 10
-//        mediaNameView.setPadding(padding, padding, padding, padding)
 
-//        addView(mMediaPlayer, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-//        addView(mediaNameView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
-
-//        mMediaPlayer.setMediaController(mMediaController)
-
-//        mMyMediaController.mMediaPlayer = mMediaPlayer
         mMyMediaController.mMediaPlayer = player
         mMyMediaController.mController = mExoPlayer
-        mMediaPlayer.setOnPreparedListener(this);
+
         setOnClickListener {
             if (isFullScreen) {
                 if (mMyMediaController.isShowing()) {
@@ -106,8 +74,12 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
             DefaultDataSourceFactory(context, Util.getUserAgent(context, "MyApplication"), null)
         val uri = Uri.parse(url)
 
-        val mediaSource =
-            HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
+        var mediaSource =
+            ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(uri) as BaseMediaSource
+        if (url.contains("m3u8")) {
+            mediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
+        }
 
         player.prepare(mediaSource)
         player.playWhenReady = true
@@ -118,17 +90,14 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
 
     fun stopPlayback() {
         player.release()
-        mMediaPlayer.stopPlayback()
     }
 
     fun pause() {
         player.playWhenReady = false
-        mMediaPlayer.pause()
     }
 
     fun resume() {
         player.playWhenReady = true
-        mMediaPlayer.start()
     }
 
     fun onBackPressed(): Boolean {
@@ -150,11 +119,6 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
         if (isSelected) {
             paintUtil.onDraw(canvas)
         }
-    }
-
-    override fun onPrepared(mp: MediaPlayer?) {
-        mMediaPlayer.start()
-        mMyMediaController.show()
     }
 
     fun switchFullScreen(fullScreen: Boolean) {
@@ -191,19 +155,13 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
         lp.setMargins(margin, margin, margin, margin)
         this.layoutParams = lp
 
-        lp = mMediaPlayer.layoutParams
-        lp.width = targetWidth
-        lp.height = targetHeight
-        mMediaPlayer.layoutParams = lp
+//        lp = mMediaPlayer.layoutParams
+//        lp.width = targetWidth
+//        lp.height = targetHeight
+//        mMediaPlayer.layoutParams = lp
 
         isFullScreen = fullScreen
 
-//        invalidate()
-    }
-
-
-    fun showToast(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     fun log(message: String) {

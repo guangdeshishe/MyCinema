@@ -4,13 +4,6 @@
     android:background="#000000"
     android:layout_height="match_parent">
 
-    <VideoView
-        android:id="@+id/mMediaPlayer"
-        android:layout_width="match_parent"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        android:layout_height="wrap_content" />
-
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/mExoPlayer"
         android:layout_width="match_parent"
@@ -24,11 +17,4 @@
         android:padding="10dp"
         android:textSize="15sp"
         android:textColor="@color/colorTitle" />
-
-    <com.agile.mycinema.MyMediaController
-        android:id="@+id/mMyMediaController"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom" />
 </FrameLayout>

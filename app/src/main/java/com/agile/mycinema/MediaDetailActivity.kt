@@ -39,10 +39,7 @@ class MediaDetailActivity : BaseActivity() {
         setContentView(R.layout.activity_media_detail)
         val tmpMediaInfo = intent.getParcelableExtra<MediaInfo>(MEDIA_INFO_KEY)
         mMediaInfo = tmpMediaInfo ?: MediaInfo()
-//        if (mMediaInfo._id.isEmpty()) {
-//            showToast("数据异常")
-//            finish()
-//        }
+
         mMediaPlayerContentView.mediaName = mMediaInfo.title
         mTitleView.text = mMediaInfo.title
 
@@ -80,7 +77,9 @@ class MediaDetailActivity : BaseActivity() {
             playUrl = playUrl.substring(index + 1, playUrl.length)
             log(playInfo.summary + " m3u8-> " + playUrl)
             playInfo.videoUrl = playUrl
-            showToast(playUrl)
+            if (playUrl.contains(".html")) {
+                showToast("暂不支持播放")
+            }
             mMediaPlayerContentView.setVideoURI(playUrl, playInfo.summary)
             return
         }
@@ -142,8 +141,6 @@ class MediaDetailActivity : BaseActivity() {
                         PlayInfo(mMediaInfo._id, mMediaInfo.title, summary, url)
                     log("$head-> $playInfo")
                     playInfoData.add(playInfo)
-//                                mMediaDataHelper.updateMediaPlayInfo(playInfo)
-//                                mPlayInfoList.add(playInfo)
                 }
             }
             if (isOk) {

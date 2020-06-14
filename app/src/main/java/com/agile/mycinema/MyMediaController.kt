@@ -1,73 +1,40 @@
 package com.agile.mycinema
 
 import android.content.Context
-import android.os.Looper
-import android.os.Message
-import android.util.AttributeSet
-import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.SeekBar
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.TrackSelection
+import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
-import kotlinx.android.synthetic.main.my_media_controller_view.view.*
-import java.lang.ref.WeakReference
-import java.util.*
+import com.google.android.exoplayer2.upstream.BandwidthMeter
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 
-class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
-    SeekBar.OnSeekBarChangeListener {
+class MyMediaController {
     lateinit var mMediaPlayer: SimpleExoPlayer
     lateinit var mController: PlayerView
 
     private val DEFAULT_SPEED = 10 * 1000//默认快进速度10秒
     var speed = DEFAULT_SPEED
 
-    //将长度转换为时间
-    var mFormatBuilder = StringBuilder()
-    var mFormatter: Formatter = Formatter(mFormatBuilder, Locale.getDefault())
-
-    val mainHandler = MyHandler(this)
-    var mUpdateThread: Thread? = null
-
     companion object {
-        class MyHandler(controller: MyMediaController) :
-            android.os.Handler(Looper.getMainLooper()) {
-            var weakReference = WeakReference<MyMediaController>(controller)
-            override fun handleMessage(msg: Message) {
-                var controller = weakReference.get()
-                when (msg.what) {
-                    0 -> controller?.updateProgress()
-                    1 -> controller?.hide()
-                }
+        fun getExoPlayer(context: Context): SimpleExoPlayer {
+            // 创建带宽
+            var bandwidthMeter: BandwidthMeter = DefaultBandwidthMeter()
 
-            }
-        }
-    }
+            // 创建轨道选择工厂
+            var videoTrackSelectionFactory: TrackSelection.Factory =
+                AdaptiveTrackSelection.Factory(bandwidthMeter)
 
-    init {
-        inflate(context, R.layout.my_media_controller_view, this)
-        mPlayProgressView.setOnSeekBarChangeListener(this)
-        mPlayControllerPause.setOnClickListener {
-            handlePause()
+            // 创建轨道选择器实例
+            var trackSelector: TrackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
+            return SimpleExoPlayer.Builder(context).setTrackSelector(trackSelector).build()
         }
-        mPlayControllerFastForward.setOnClickListener {
-            progressForward()
-        }
-        mPlayControllerFastRewind.setOnClickListener {
-            progressBack()
-        }
-
     }
 
     fun handlePause() {
         show()
-        if (mMediaPlayer.isPlaying) {
-            (mPlayControllerPause as ImageView).setImageResource(R.drawable.ic_media_controller_play)
-            mMediaPlayer.playWhenReady = false
-        } else {
-            (mPlayControllerPause as ImageView).setImageResource(R.drawable.ic_media_controller_pause)
-            mMediaPlayer.playWhenReady = true
-        }
+        mMediaPlayer.playWhenReady = !mMediaPlayer.isPlaying
     }
 
     fun isShowing(): Boolean {
@@ -78,70 +45,9 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
         show(3 * 1000)
     }
 
-    fun show(timeout: Long) {
+    private fun show(timeout: Long) {
         mController.controllerShowTimeoutMs = timeout.toInt()
         mController.showController()
-//        visibility = View.VISIBLE
-//        updateProgress()
-//        mUpdateThread = object : Thread() {
-//            override fun run() {
-//                try {
-//                    while (mMediaPlayer.isPlaying && isShowing()) {
-//                        // 如果正在播放，没0.5.毫秒更新一次进度条
-//                        mainHandler.sendEmptyMessage(0)
-//                        sleep(500)
-//                    }
-//                    mUpdateThread = null
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                }
-//            }
-//        }
-//        try {
-//            mUpdateThread?.start()
-//        } catch (e: Throwable) {
-//            e.printStackTrace()
-//        }
-//
-//        mainHandler.removeMessages(1)
-//        mainHandler.sendEmptyMessageDelayed(1, timeout)
-    }
-
-    fun updateProgress() {
-        mCurrentTime.text = stringForTime(mMediaPlayer.currentPosition)
-        mEndTime.text = stringForTime(mMediaPlayer.duration)
-        mPlayProgressView.max = mMediaPlayer.duration.toInt()
-        mPlayProgressView.progress = mMediaPlayer.currentPosition.toInt()
-    }
-
-    fun hide() {
-        visibility = View.GONE
-    }
-
-    //将长度转换为时间
-    private fun stringForTime(timeMs: Long): String? {
-        val totalSeconds = timeMs / 1000
-        val seconds = totalSeconds % 60
-        val minutes = totalSeconds / 60 % 60
-        val hours = totalSeconds / 3600
-        mFormatBuilder.setLength(0)
-        return if (hours > 0) {
-            mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString()
-        } else {
-            mFormatter.format("%02d:%02d", minutes, seconds).toString()
-        }
-    }
-
-    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        if (fromUser) {
-            mMediaPlayer.seekTo(progress.toLong())
-        }
-    }
-
-    override fun onStartTrackingTouch(seekBar: SeekBar?) {
-    }
-
-    override fun onStopTrackingTouch(seekBar: SeekBar?) {
     }
 
     //前进
@@ -165,7 +71,6 @@ class MyMediaController(context: Context, attrs: AttributeSet?) : FrameLayout(co
     fun progressBack() {
         show()
         val position = mMediaPlayer.currentPosition//当前时长
-        val duration = mMediaPlayer.duration//总的时长
         var targetPosition = position - speed
         if (targetPosition < 0) {
             targetPosition = 0
