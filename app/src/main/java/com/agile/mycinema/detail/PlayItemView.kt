@@ -1,4 +1,4 @@
-package com.agile.mycinema
+package com.agile.mycinema.detail
 
 import android.content.Context
 import android.graphics.Canvas
@@ -6,17 +6,24 @@ import android.graphics.Color
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
+import com.agile.mycinema.AnimatorProUtil
+import com.agile.mycinema.ISelectListener
+import com.agile.mycinema.R
 import com.agile.mycinema.utils.PaintUtil
 import kotlinx.android.synthetic.main.grideview_media_item_view.view.*
 
-class PlayItemView(context: Context) : FrameLayout(context), ISelectListener {
+class PlayItemView(context: Context) : FrameLayout(context),
+    ISelectListener {
 
     var paintUtil = PaintUtil(this)
     var fontSize = 15f;
     var fontBigSize = 17f;
 
     init {
-        inflate(context, R.layout.grideview_play_item_view, this)
+        inflate(
+            context,
+            R.layout.grideview_play_item_view, this
+        )
 
 
     }
@@ -25,7 +32,12 @@ class PlayItemView(context: Context) : FrameLayout(context), ISelectListener {
         mTitleView.text = mediaInfo.summary
         if (isSelected) {
             mTitleView.setBackgroundColor(Color.parseColor("#ffffff"))
-            mTitleView.setTextColor(ContextCompat.getColor(context, R.color.colorTheme))
+            mTitleView.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.colorTheme
+                )
+            )
         } else {
             mTitleView.setBackgroundColor(Color.parseColor("#77000000"))
             mTitleView.setTextColor(Color.parseColor("#ffffff"))
@@ -43,9 +55,17 @@ class PlayItemView(context: Context) : FrameLayout(context), ISelectListener {
     override fun onSelectChanged(select: Boolean) {
         isSelected = select
         if (!isSelected) {
-            AnimatorProUtil.startTextSizeAnimator(mTitleView, fontBigSize, fontSize)
+            AnimatorProUtil.startTextSizeAnimator(
+                mTitleView,
+                fontBigSize,
+                fontSize
+            )
         } else {
-            AnimatorProUtil.startTextSizeAnimator(mTitleView, fontSize, fontBigSize)
+            AnimatorProUtil.startTextSizeAnimator(
+                mTitleView,
+                fontSize,
+                fontBigSize
+            )
         }
         invalidate()
     }

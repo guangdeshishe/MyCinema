@@ -1,9 +1,9 @@
 package com.agile.mycinema
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.agile.mycinema.utils.LogUtil
+import com.agile.mycinema.utils.NoticeUtil
 import com.lzy.okgo.OkGo
 import com.lzy.okgo.callback.StringCallback
 import com.lzy.okgo.model.Response
@@ -150,7 +150,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        NoticeUtil.showToast(message)
     }
 
     /**

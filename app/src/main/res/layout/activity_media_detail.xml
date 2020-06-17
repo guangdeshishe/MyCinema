@@ -15,7 +15,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.agile.mycinema.MediaPlayContentView
+        <com.agile.mycinema.detail.MediaPlayContentView
             android:id="@+id/mMediaPlayerContentView"
             android:layout_width="300dp"
             android:layout_height="200dp"
@@ -58,7 +58,7 @@
         </com.agile.mycinema.CommonLinearLayout>
     </LinearLayout>
 
-    <com.agile.mycinema.PlayGridView
+    <com.agile.mycinema.detail.PlayGridView
         android:id="@+id/mPlayGridView"
         android:layout_width="0dp"
         android:layout_height="0dp"

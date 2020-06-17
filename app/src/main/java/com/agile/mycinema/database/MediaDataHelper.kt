@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.agile.mycinema.MediaInfo
 import com.agile.mycinema.MediaType
-import com.agile.mycinema.PlayInfo
+import com.agile.mycinema.detail.PlayInfo
 import java.util.*
 
 

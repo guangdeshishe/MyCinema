@@ -6,18 +6,15 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AbsListView
 import android.widget.AdapterView
-import com.agile.mycinema.*
-import com.agile.mycinema.utils.Constant
-import com.agile.mycinema.utils.Constant.Companion.HOST
-import com.agile.mycinema.utils.Constant.Companion.MEDIA_TOP_Micro_Movie_URL
-import com.agile.mycinema.utils.Constant.Companion.MEDIA_TOP_TV_SHOW_URL
-import com.agile.mycinema.utils.Constant.Companion.MEDIA_TOP_TV_URL
-import com.agile.mycinema.utils.Constant.Companion.MEDIA_TOP_URL
+import com.agile.mycinema.BaseActivity
+import com.agile.mycinema.MainActivity.Companion.WebPageDataSet
+import com.agile.mycinema.MediaGridAdapter
+import com.agile.mycinema.MediaInfo
+import com.agile.mycinema.R
+import com.agile.mycinema.detail.MediaDetailActivity
 import kotlinx.android.synthetic.main.activity_more_media.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
 import java.util.*
 
 
@@ -74,74 +71,24 @@ class MoreMediaActivity : BaseActivity(),
             ) {//返回的数据不是当前分类下的
                 return
             }
+            WebPageDataSet.parseMorePageData(content, action, obj, mMediaInfo)
 
-            //获取下一页数据
-            val pageInfoElements = doc.select("div.ui-vpages a[data]")
-            for (pageInfo in pageInfoElements) {
-                val pageUrl = HOST + pageInfo.attr("href")
-                val value = pageInfo.text()
-                if (mediaType.nextPage.toString() == value) {
-                    mediaType.nextPage++
-                    mediaType.nextPageUrl = pageUrl
-                    break
-                }
-            }
-            log("nextUrl -> " + mediaType.nextPageUrl)
 
-            val ulElements: Elements = doc.select("ul")
-            val mediaDatas = LinkedList<MediaInfo>()
-            for (ulElement in ulElements) {
-                val ulDoc: Document = Jsoup.parse(ulElement.html())
-                val liElements: Elements = ulDoc.select("li")
-                var type = MediaType.UnKnow;
-                if (liElements.size == 0) {
-                    continue
-                }
-                for (lisHtml in liElements) {
-                    val liDoc: Document = Jsoup.parse(lisHtml.html())
-                    val linkElements: Elements = liDoc.select("a[href]")
-                    val imageElements: Elements = liDoc.select("img[src]")
-                    if (linkElements.size == 0 || imageElements.size == 0) {
-                        break
-                    }
-                    val linkItem: Element = linkElements[0]
-                    val imageItem: Element = imageElements[0]
-                    var title = linkItem.attr("title")
-                    var imageUrl = imageItem.attr("src")
-
-                    val mediaUrl = Constant.HOST + linkItem.attr("href")
-
-                    var mediaInfo =
-                        MediaInfo().type(type).title(title).image(imageUrl).url(mediaUrl)
-                            .title(title).isHot(true)
-                    mediaDatas.add(mediaInfo)
-                    log(mediaInfo.toString())
-                }
-            }
             if (action == ACTION_LOAD_MORE) {//加载更多
-                mMediaDataAdapter.addData(mediaDatas)
+                mMediaDataAdapter.addData(WebPageDataSet.mediaDatas)
             } else {//初始化数据
                 if (!mediaType.isSubType) {
                     //最新、热门、评分
-                    val subMediaType = LinkedList<SubMediaType>()
-                    val subTitleElements = doc.select("div.list_ico a[href]")
-                    for (aElement in subTitleElements) {
-                        val title = aElement.text()
-                        val titleName = title.substring(1, title.length)
-                        val url = Constant.HOST + aElement.attr("href")
-                        subMediaType.add(SubMediaType(titleName, url, true))
-                    }
 
-                    mMediaSubTypeContentView.initData(subMediaType)
-                    if (subMediaType.size > 0) {
+                    mMediaSubTypeContentView.initData(WebPageDataSet.subMediaType)
+                    if (WebPageDataSet.subMediaType.size > 0) {
                         mMediaSubTypeMainContentView.visibility = View.VISIBLE
-//                        mMediaSubTypeContentView.loadFirst()
                     } else {
                         mMediaSubTypeMainContentView.visibility = View.GONE
                     }
                 }
 
-                mMediaDataAdapter.initData(mediaDatas)
+                mMediaDataAdapter.initData(WebPageDataSet.mediaDatas)
                 mMediaDataGridView.postDelayed({
                     mMediaDataGridView.requestFocus()
                     mMediaDataGridView.scrollTo(0, 0)
@@ -149,31 +96,9 @@ class MoreMediaActivity : BaseActivity(),
             }
             return
         }
+        WebPageDataSet.parseMorePageData(content, action, obj, mMediaInfo)
         //加载主界面数据
-        log(doc.title())
-        val titleElements = doc.select("div.modo_title")
-        val mediaTypes = LinkedList<SubMediaType>()
-        when (mMediaInfo.type) {
-            MediaType.MOVIE -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_URL, false))
-            MediaType.TV -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_TV_URL, false))
-            MediaType.TVSHOW -> mediaTypes.add(SubMediaType("排行榜", MEDIA_TOP_TV_SHOW_URL, false))
-            MediaType.MicroMovie -> mediaTypes.add(
-                SubMediaType(
-                    "排行榜",
-                    MEDIA_TOP_Micro_Movie_URL,
-                    false
-                )
-            )
-        }
-
-        for (titleElement in titleElements) {
-            val aElement = titleElement.select("a[href]")
-            val titleName = aElement.attr("title")
-            val url = Constant.HOST + aElement.attr("href")
-            mediaTypes.add(SubMediaType(titleName, url, false))
-        }
-
-        mMediaTypeContentView.initData(mediaTypes)
+        mMediaTypeContentView.initData(WebPageDataSet.mediaTypes)
     }
 
     fun initView() {

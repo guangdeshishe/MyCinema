@@ -1,4 +1,4 @@
-package com.agile.mycinema
+package com.agile.mycinema.detail
 
 import android.app.Activity
 import android.view.View

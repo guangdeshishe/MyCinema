@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MediaDetailActivity"
+            android:name=".detail.MediaDetailActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name=".moremedia.MoreMediaActivity"

@@ -1,4 +1,4 @@
-package com.agile.mycinema
+package com.agile.mycinema.detail
 
 import android.content.Context
 import android.graphics.Rect
@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.AdapterView
 import android.widget.GridView
+import com.agile.mycinema.ISelectListener
 
 class PlayGridView(context: Context?, attrs: AttributeSet?) : GridView(context, attrs),
     AdapterView.OnItemSelectedListener {

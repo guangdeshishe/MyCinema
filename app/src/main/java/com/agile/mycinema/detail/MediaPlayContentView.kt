@@ -1,4 +1,4 @@
-package com.agile.mycinema
+package com.agile.mycinema.detail
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,6 +10,8 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import com.agile.mycinema.MyMediaController
+import com.agile.mycinema.R
 import com.agile.mycinema.utils.Constant
 import com.agile.mycinema.utils.PaintUtil
 import com.google.android.exoplayer2.source.BaseMediaSource
@@ -27,13 +29,17 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
     var isFullScreen = false
     var mediaName = ""
 
-    var player = MyMediaController.getExoPlayer(context)
+    var player =
+        MyMediaController.getExoPlayer(context)
 
     var mMyMediaController = MyMediaController()
 
 
     init {
-        inflate(context, R.layout.media_player_content_view, this)
+        inflate(
+            context,
+            R.layout.media_player_content_view, this
+        )
         mExoPlayer.player = player
 
         isFocusable = true
