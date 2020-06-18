@@ -85,7 +85,7 @@ class MediaDetailActivity : BaseActivity() {
 
     override fun onLoadPageDataSuccess(content: String, action: Int, obj: Any?) {
         WebPageDataSet.parsePlayPageData(content, action, obj, mMediaInfo)
-
+        val lastVideoUrl = mMediaDataHelper.getMediaVideoUrl(mMediaInfo.url)
         if (action == ACTION_ITEM_CLICK) {
             val playInfo = obj as PlayInfo
             var playUrl = WebPageDataSet.playUrl
@@ -93,7 +93,15 @@ class MediaDetailActivity : BaseActivity() {
             if (playUrl.contains(".html")) {
                 NoticeUtil.showToast("暂不支持播放")
             } else {
-                mMediaPlayerContentView.setVideoURI(playUrl, playInfo.summary)
+                var progress: Long = 0
+                if (lastVideoUrl == playInfo.url) {
+                    progress = mMediaDataHelper.getMediaPlayProgress(mMediaInfo.url)
+                }
+                mMediaPlayerContentView.setVideoURI(
+                    playUrl,
+                    playInfo.summary,
+                    progress
+                )
             }
             return
         }
@@ -105,7 +113,14 @@ class MediaDetailActivity : BaseActivity() {
         mAdapter.initData(WebPageDataSet.playInfoData)
         mPlayGridView.postDelayed({
             mPlayGridView.requestFocus()
-            val selectedItem = 0
+            var selectedItem = 0
+            if (lastVideoUrl.isNotEmpty()) {
+                for ((index, playInfo) in WebPageDataSet.playInfoData.withIndex()) {
+                    if (lastVideoUrl == playInfo.url) {
+                        selectedItem = index
+                    }
+                }
+            }
             mPlayGridView.setSelection(selectedItem)
             handleItemClick(selectedItem)
         }, 500)
@@ -116,7 +131,11 @@ class MediaDetailActivity : BaseActivity() {
         mAdapter.selectedPosition = position
         mAdapter.notifyDataSetChanged()
         if (playInfo.videoUrl.isNotEmpty()) {
-            mMediaPlayerContentView.setVideoURI(playInfo.videoUrl, playInfo.summary)
+            mMediaPlayerContentView.setVideoURI(
+                playInfo.videoUrl,
+                playInfo.summary,
+                mMediaDataHelper.getMediaPlayProgress(playInfo.videoUrl)
+            )
             return
         }
         loadPageData(
@@ -141,6 +160,12 @@ class MediaDetailActivity : BaseActivity() {
     override fun onPause() {
         mMediaPlayerContentView.pause()
         super.onPause()
+        val playInfo = mAdapter.getItem(mAdapter.selectedPosition) as PlayInfo
+        mMediaDataHelper.updatePlayProgressInfo(
+            mMediaInfo.url,
+            playInfo.url,
+            mMediaPlayerContentView.getPlayProgress()
+        )
     }
 
     override fun onDestroy() {

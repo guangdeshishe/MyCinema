@@ -2,6 +2,7 @@ package com.agile.mycinema
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.agile.mycinema.database.MediaDataHelper
 import com.agile.mycinema.utils.LogUtil
 import com.agile.mycinema.utils.NoticeUtil
 import com.lzy.okgo.OkGo
@@ -17,7 +18,7 @@ import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
 abstract class BaseActivity : AppCompatActivity() {
-    //    lateinit var mMediaDataHelper: MediaDataHelper
+    lateinit var mMediaDataHelper: MediaDataHelper
     val cacheDatas = HashMap<String, String>()
     val cacheKeys = HashMap<String, String>()
 
@@ -28,7 +29,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        mMediaDataHelper = MediaDataHelper.getInstance(this)
+        mMediaDataHelper = MediaDataHelper.getInstance(this)
     }
 
     fun loadPageData(url: String) {

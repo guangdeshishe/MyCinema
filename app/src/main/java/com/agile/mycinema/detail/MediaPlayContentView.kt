@@ -10,10 +10,11 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import com.agile.mycinema.MyMediaController
 import com.agile.mycinema.R
 import com.agile.mycinema.utils.Constant
 import com.agile.mycinema.utils.PaintUtil
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Player.STATE_READY
 import com.google.android.exoplayer2.source.BaseMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
@@ -22,7 +23,8 @@ import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.media_player_content_view.view.*
 
 
-class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
+class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
+    Player.EventListener {
 
     var paintUtil = PaintUtil(this)
 
@@ -33,6 +35,8 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
         MyMediaController.getExoPlayer(context)
 
     var mMyMediaController = MyMediaController()
+
+    var mLastPlayProgress: Long = -1
 
 
     init {
@@ -76,9 +80,9 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
      *
      * @param uri the URI of the video.
      */
-    fun setVideoURI(url: String, title: String) {
+    fun setVideoURI(url: String, title: String, lastPlayProgress: Long) {
 //        mMediaPlayer.setVideoURI(Uri.parse(url))
-
+        mLastPlayProgress = lastPlayProgress
         // 创建加载数据的工厂
 
         // 创建加载数据的工厂
@@ -93,11 +97,22 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
             mediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
         }
 
+        player.addListener(this)
         player.prepare(mediaSource)
         player.playWhenReady = true
 
+
         var fullTitle = "$mediaName    $title"
         mediaNameView.text = fullTitle
+    }
+
+    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+        if (playbackState == STATE_READY) {
+            if (mLastPlayProgress > 0) {
+                player.seekTo(mLastPlayProgress)
+                mLastPlayProgress = -1
+            }
+        }
     }
 
     fun stopPlayback() {
@@ -221,6 +236,13 @@ class MediaPlayContentView(context: Context, attrs: AttributeSet?) : FrameLayout
 //            return true
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    /**
+     * 获取当前播放进度
+     */
+    fun getPlayProgress(): Long {
+        return player.currentPosition
     }
 
 }

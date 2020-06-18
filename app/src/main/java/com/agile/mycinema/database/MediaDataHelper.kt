@@ -20,6 +20,7 @@ class MediaDataHelper(
 
     companion object {
         private const val DB_NAME = "MediaData.db"
+        const val MEDIA_PLAY_PROGRESS_TABLE = "MediaPlayProgressHistory"//播放历史记录
         const val MEDIA_INFO_TABLE = "MediaInfo"//影视信息
         const val MEDIA_PLAY_INFO_TABLE = "MediaPlayInfo"//视频播放链接
         const val VALUE_ID = "_id"
@@ -40,6 +41,7 @@ class MediaDataHelper(
         const val MEDIA_PLAY_URL = "playUrl";//播放详情界网址
         const val MEDIA_VIDEO_URL = "videoUrl";//真正的视频播放链接
         const val MEDIA_UPDATE_TIME = "updateTime";//更新时间
+        const val MEDIA_PLAY_PROGRESS = "playProgress";//播放进度
         private lateinit var instance: MediaDataHelper
         fun getInstance(context: Context): MediaDataHelper {
             if (!this::instance.isInitialized) {
@@ -50,6 +52,13 @@ class MediaDataHelper(
     }
 
     override fun onCreate(db: SQLiteDatabase) {
+        val createMediaPlayHistoryTable =
+            "create table $MEDIA_PLAY_PROGRESS_TABLE(" +
+                    "_id integer primary key autoincrement," +
+                    "$MEDIA_PLAY_URL text default ''," +
+                    "$MEDIA_VIDEO_URL text default ''," +
+                    "$MEDIA_PLAY_PROGRESS real default 0," +
+                    "$MEDIA_UPDATE_TIME TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)"
         val createMediaInfoTable =
             "create table $MEDIA_INFO_TABLE(" +
                     "_id integer primary key autoincrement ," +
@@ -75,8 +84,58 @@ class MediaDataHelper(
                     "$MEDIA_PLAY_URL text default ''," +
                     "$MEDIA_VIDEO_URL text default ''," +
                     "$MEDIA_UPDATE_TIME TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)"
-        db.execSQL(createMediaInfoTable)
-        db.execSQL(createMediaPlayUrlTable)
+        db.execSQL(createMediaPlayHistoryTable)
+//        db.execSQL(createMediaInfoTable)
+//        db.execSQL(createMediaPlayUrlTable)
+    }
+
+    fun updatePlayProgressInfo(
+        playUrl: String?, videoUrl: String?, progress: Long
+    ) {
+        if (playUrl.isNullOrEmpty() || videoUrl.isNullOrEmpty() || progress <= 0) {
+            return
+        }
+        val db: SQLiteDatabase = writableDatabase
+        val cv = ContentValues()
+        cv.put(MEDIA_PLAY_URL, playUrl)
+        cv.put(MEDIA_VIDEO_URL, videoUrl)
+        cv.put(MEDIA_PLAY_PROGRESS, progress)
+
+        var playProgress = getMediaPlayProgress(playUrl)
+        if (playProgress < 0) {//新增
+            db.insert(MEDIA_PLAY_PROGRESS_TABLE, null, cv)
+        } else {//更新
+            db.update(MEDIA_PLAY_PROGRESS_TABLE, cv, "$MEDIA_PLAY_URL=?", arrayOf(playUrl))
+        }
+        db.close()
+    }
+
+    fun getMediaVideoUrl(playUrl: String): String {
+        val cursor =
+            writableDatabase.query(
+                MEDIA_PLAY_PROGRESS_TABLE, null, "$MEDIA_PLAY_URL = ?",
+                arrayOf(playUrl), null, null, null
+            )
+        var videoUrl = ""
+        if (cursor.moveToFirst()) {
+            videoUrl = cursor.getString(cursor.getColumnIndex(MEDIA_VIDEO_URL))
+        }
+        cursor.close()
+        return videoUrl
+    }
+
+    fun getMediaPlayProgress(playUrl: String): Long {
+        val cursor =
+            writableDatabase.query(
+                MEDIA_PLAY_PROGRESS_TABLE, null, "$MEDIA_PLAY_URL = ?",
+                arrayOf(playUrl), null, null, null
+            )
+        var progress = (-1).toLong()
+        if (cursor.moveToFirst()) {
+            progress = cursor.getLong(cursor.getColumnIndex(MEDIA_PLAY_PROGRESS))
+        }
+        cursor.close()
+        return progress
     }
 
     fun updateMediaPlayInfo(

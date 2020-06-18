@@ -1,4 +1,4 @@
-package com.agile.mycinema
+package com.agile.mycinema.detail
 
 import android.content.Context
 import com.google.android.exoplayer2.SimpleExoPlayer
