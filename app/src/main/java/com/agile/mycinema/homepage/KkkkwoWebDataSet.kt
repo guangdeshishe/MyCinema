@@ -50,6 +50,10 @@ open class KkkkwoWebDataSet() : AbstractHomePageDataSet() {
 
         val ulElements: Elements = doc.select("ul.list_tab_img")
         var index = 0;
+        movieDatas.clear()
+        tvDatas.clear()
+        tvShowDatas.clear()
+        microMovieDatas.clear()
         for (ulElement in ulElements) {
 
             val ulDoc: Document = Jsoup.parse(ulElement.html())

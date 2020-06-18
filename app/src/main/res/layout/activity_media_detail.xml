@@ -18,7 +18,7 @@
         <com.agile.mycinema.detail.MediaPlayContentView
             android:id="@+id/mMediaPlayerContentView"
             android:layout_width="300dp"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:nextFocusRight="@+id/mTitleDescribeView"
             android:nextFocusDown="@+id/mPlayGridView" />
@@ -26,7 +26,7 @@
         <com.agile.mycinema.CommonLinearLayout
             android:id="@+id/mTitleDescribeView"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:nextFocusLeft="@+id/mMediaPlayerContentView"
             android:nextFocusDown="@+id/mPlayGridView"
