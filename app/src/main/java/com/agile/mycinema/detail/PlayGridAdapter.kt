@@ -13,7 +13,10 @@ class PlayGridAdapter(context: Activity) : BaseAdapter() {
     var mContext = context
     var selectedPosition = 0
 
-    fun initData(medias: LinkedList<PlayInfo>) {
+    fun initData(medias: LinkedList<PlayInfo>?) {
+        if (medias == null) {
+            return
+        }
         mPlayInfos.clear()
         mPlayInfos.addAll(medias)
         notifyDataSetChanged()

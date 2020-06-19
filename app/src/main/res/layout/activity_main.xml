@@ -17,6 +17,12 @@
             android:orientation="vertical">
 
             <com.agile.mycinema.moremedia.SelectableTextView
+                android:id="@+id/mTv331WebSite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="叶子影院" />
+
+            <com.agile.mycinema.moremedia.SelectableTextView
                 android:id="@+id/mKankanwuWebSite"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,7 +60,7 @@
                 android:id="@+id/mSuggestMediaGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="6"
+                android:numColumns="5"
                 android:visibility="gone" />
 
             <com.agile.mycinema.CommonTextView
@@ -67,7 +73,7 @@
                 android:id="@+id/mHotMovieGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="6" />
+                android:numColumns="5" />
 
             <com.agile.mycinema.CommonTextView
                 android:id="@+id/mHotTVTitle"
@@ -79,7 +85,7 @@
                 android:id="@+id/mHotTVGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="6" />
+                android:numColumns="5" />
 
             <com.agile.mycinema.CommonTextView
                 android:id="@+id/mHotTVShowTitle"
@@ -91,7 +97,7 @@
                 android:id="@+id/mHotTVShowGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="6" />
+                android:numColumns="5" />
 
             <com.agile.mycinema.CommonTextView
                 android:id="@+id/mHotMicroMovieTitle"
@@ -103,7 +109,7 @@
                 android:id="@+id/mHotMicroMovieGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="6" />
+                android:numColumns="5" />
 
         </LinearLayout>
     </ScrollView>

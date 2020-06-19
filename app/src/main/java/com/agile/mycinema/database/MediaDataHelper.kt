@@ -146,8 +146,8 @@ class MediaDataHelper(
         if (playInfo.mediaId.isNotEmpty()) {
             cv.put(MEDIA_ID, playInfo.mediaId)
         }
-        if (playInfo.title.isNotEmpty()) {
-            cv.put(MEDIA_TITLE, playInfo.title)
+        if (playInfo.text.isNotEmpty()) {
+            cv.put(MEDIA_TITLE, playInfo.text)
         }
         if (playInfo.summary.isNotEmpty()) {
             cv.put(MEDIA_SUMMARY, playInfo.summary)
@@ -251,7 +251,7 @@ class MediaDataHelper(
         var playInfo = PlayInfo()
         playInfo._id = cursor.getString(cursor.getColumnIndex(VALUE_ID))
         playInfo.mediaId = cursor.getString(cursor.getColumnIndex(MEDIA_ID))
-        playInfo.title = cursor.getString(cursor.getColumnIndex(MEDIA_TITLE))
+        playInfo.text = cursor.getString(cursor.getColumnIndex(MEDIA_TITLE))
         playInfo.summary = cursor.getString(cursor.getColumnIndex(MEDIA_SUMMARY))
         playInfo.url = cursor.getString(cursor.getColumnIndex(MEDIA_PLAY_URL))
         playInfo.videoUrl = cursor.getString(cursor.getColumnIndex(MEDIA_VIDEO_URL))

@@ -14,6 +14,7 @@ import com.agile.mycinema.detail.MediaDetailActivity
 import com.agile.mycinema.homepage.AbstractHomePageDataSet
 import com.agile.mycinema.homepage.KankanwuWebDataSet
 import com.agile.mycinema.homepage.KkkkwoWebDataSet
+import com.agile.mycinema.homepage.Tv331WebDataSet
 import com.agile.mycinema.moremedia.MoreMediaActivity
 import com.agile.mycinema.utils.Constant
 import com.agile.mycinema.utils.UnitUtil
@@ -41,8 +42,10 @@ class MainActivity : BaseActivity(),
 
     companion object {
         var WebPageDataSet: AbstractHomePageDataSet =
+            Tv331WebDataSet()
+//        KankanwuWebDataSet()
 //            KkkkwoWebDataSet()
-            KankanwuWebDataSet()
+
 //            L090ys1WebDataSet()
     }
 
@@ -83,8 +86,17 @@ class MainActivity : BaseActivity(),
         mHotTVShowGridView.onItemClickListener = this
         mHotMicroMovieGridView.onItemClickListener = this
 
-        mKankanwuWebSite.changeSelected(true)
+        mTv331WebSite.changeSelected(true)
+        mTv331WebSite.setOnClickListener {
+            mTv331WebSite.changeSelected(true)
+            mKankanwuWebSite.changeSelected(false)
+            mKkkkwoWebSite.changeSelected(false)
+            mContentScrollView.fullScroll(ScrollView.FOCUS_UP)
+            WebPageDataSet = Tv331WebDataSet()
+            initView()
+        }
         mKankanwuWebSite.setOnClickListener {
+            mTv331WebSite.changeSelected(false)
             mKankanwuWebSite.changeSelected(true)
             mKkkkwoWebSite.changeSelected(false)
             mContentScrollView.fullScroll(ScrollView.FOCUS_UP)
@@ -92,6 +104,7 @@ class MainActivity : BaseActivity(),
             initView()
         }
         mKkkkwoWebSite.setOnClickListener {
+            mTv331WebSite.changeSelected(false)
             mKankanwuWebSite.changeSelected(false)
             mKkkkwoWebSite.changeSelected(true)
             mContentScrollView.fullScroll(ScrollView.FOCUS_UP)
@@ -151,6 +164,9 @@ class MainActivity : BaseActivity(),
                     MediaInfo().type(MediaType.MicroMovie).url(microMovieUrl)
                 )
             }
+        } else {
+            mHotMicroMovieTitle.visibility = View.GONE
+            mHotMicroMovieGridView.visibility = View.GONE
         }
 
         mHotMovieAdapter.initData(filterRepeatMedia(WebPageDataSet.movieDatas))

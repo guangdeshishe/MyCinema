@@ -12,6 +12,7 @@ import com.agile.mycinema.MediaGridAdapter
 import com.agile.mycinema.MediaInfo
 import com.agile.mycinema.R
 import com.agile.mycinema.detail.MediaDetailActivity
+import com.agile.mycinema.view.SelectAdapterLinearLayout
 import kotlinx.android.synthetic.main.activity_more_media.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -19,7 +20,7 @@ import java.util.*
 
 
 class MoreMediaActivity : BaseActivity(),
-    AdapterView.OnItemClickListener, MediaTypeListView.MediaTypeClickListener,
+    AdapterView.OnItemClickListener, SelectAdapterLinearLayout.SelectItemClickListener,
     AbsListView.OnScrollListener, AdapterView.OnItemSelectedListener {
 
     private lateinit var mMediaDataAdapter: MediaGridAdapter
@@ -49,8 +50,8 @@ class MoreMediaActivity : BaseActivity(),
         mMediaDataGridView.onItemClickListener = this
         mMediaDataGridView.setOnScrollListener(this)
 
-        mMediaTypeContentView.mMediaTypeClickListener = this
-        mMediaSubTypeContentView.mMediaTypeClickListener = this
+        mMediaTypeContentView.mSelectItemClickListener = this
+        mMediaSubTypeContentView.mSelectItemClickListener = this
 
         mMediaDataGridView.mListener = this
         initView()
@@ -66,8 +67,9 @@ class MoreMediaActivity : BaseActivity(),
         if (action == ACTION_ITEM_CLICK || action == ACTION_LOAD_MORE) {//点击分类/加载更多
             val mediaType = obj as SubMediaType
 
-            if (mMediaTypeContentView.getCurrentMediaType() != mediaType
-                && (mMediaSubTypeContentView.isDataEmpty() || mMediaSubTypeContentView.getCurrentMediaType() != mediaType)
+            if (mMediaTypeContentView.getCurrentData().getData() as SubMediaType != mediaType
+                && (mMediaSubTypeContentView.isDataEmpty() || mMediaSubTypeContentView.getCurrentData()
+                    .getData() as SubMediaType != mediaType)
             ) {//返回的数据不是当前分类下的
                 return
             }
@@ -99,6 +101,7 @@ class MoreMediaActivity : BaseActivity(),
         WebPageDataSet.parseMorePageData(content, action, obj, mMediaInfo)
         //加载主界面数据
         mMediaTypeContentView.initData(WebPageDataSet.mediaTypes)
+        onSelectItemClick(0, mMediaTypeContentView.getCurrentData())
     }
 
     fun initView() {
@@ -116,7 +119,9 @@ class MoreMediaActivity : BaseActivity(),
         )
     }
 
-    override fun onMediaTypeClick(position: Int, mediaType: SubMediaType) {
+    override fun onSelectItemClick(position: Int, data: Any) {
+        val mediaType = data as SubMediaType
+
         if (mediaType.url.isEmpty()) {
             mMediaDataAdapter.initData(LinkedList())
             return
@@ -125,6 +130,7 @@ class MoreMediaActivity : BaseActivity(),
         mMediaDataAdapter.clear()
         log("onMediaTypeClick:$position")
         loadPageData(mediaType.url, ACTION_ITEM_CLICK, mediaType)
+
     }
 
     override fun onScroll(
@@ -151,7 +157,7 @@ class MoreMediaActivity : BaseActivity(),
                 showToast("数据加载中,请稍候")
                 return
             }
-            val mediaType = mMediaTypeContentView.getCurrentMediaType()
+            val mediaType = mMediaTypeContentView.getCurrentData() as SubMediaType
             if (mediaType.nextPageUrl.isEmpty()) {
                 showToast("没有更多数据了")
                 return

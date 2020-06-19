@@ -10,29 +10,31 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
-        <com.agile.mycinema.moremedia.MediaTypeListView
+        <com.agile.mycinema.view.SelectAdapterLinearLayout
             android:id="@+id/mMediaTypeContentView"
             android:layout_width="100dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
     </ScrollView>
 
     <ScrollView
         android:id="@+id/mMediaSubTypeMainContentView"
         android:layout_width="wrap_content"
-        android:layout_marginLeft="1dp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="1dp">
 
-        <com.agile.mycinema.moremedia.MediaTypeListView
+        <com.agile.mycinema.view.SelectAdapterLinearLayout
             android:id="@+id/mMediaSubTypeContentView"
             android:layout_width="80dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
     </ScrollView>
 
     <com.agile.mycinema.moremedia.MediaMoreGridView
         android:id="@+id/mMediaDataGridView"
         android:layout_width="match_parent"
-        android:layout_marginLeft="1dp"
         android:layout_height="match_parent"
+        android:layout_marginLeft="1dp"
         android:numColumns="5" />
     <!--    </ScrollView>-->
 </LinearLayout>

@@ -110,6 +110,8 @@ class MediaDetailActivity : BaseActivity() {
         mDescribeView.text = mMediaInfo.describe
         mDescribeFullView.text = mMediaInfo.describe
 
+        mSourcesPlayList.initData(WebPageDataSet.mSourcePlayDataSet)
+//        mAdapter.initData(WebPageDataSet.mPlayInfoDataSet.get(WebPageDataSet.mSourcePlayDataSet[0].getTitle()))
         mAdapter.initData(WebPageDataSet.playInfoData)
         mPlayGridView.postDelayed({
             mPlayGridView.requestFocus()

@@ -1,6 +1,9 @@
 package com.agile.mycinema.moremedia
 
-class SubMediaType(var mediaType: String, var url: String, var isSubType: Boolean) {
+import com.agile.mycinema.view.SelectAdapterLinearLayout
+
+class SubMediaType(var mediaType: String, var url: String, var isSubType: Boolean) :
+    SelectAdapterLinearLayout.IValueHolder {
     var nextPageUrl = "" //下一页链接
     var nextPage = DEFAULT_NEXT_PAGE
 
@@ -11,6 +14,14 @@ class SubMediaType(var mediaType: String, var url: String, var isSubType: Boolea
 
     fun resetNextPage() {
         nextPage = DEFAULT_NEXT_PAGE
+    }
+
+    override fun getTitle(): String {
+        return mediaType
+    }
+
+    override fun getData(): Any {
+        return this
     }
 //    UnKnow("未知",""),//未知分类
 //    MovieTop("排行榜","http://m.kkkkwo.com/top_mov.html"),

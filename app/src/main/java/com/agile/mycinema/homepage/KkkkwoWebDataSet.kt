@@ -8,6 +8,7 @@ import com.agile.mycinema.moremedia.MoreMediaActivity
 import com.agile.mycinema.moremedia.SubMediaType
 import com.agile.mycinema.utils.LogUtil
 import com.agile.mycinema.utils.NoticeUtil
+import com.agile.mycinema.view.SelectAdapterLinearLayout
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -128,7 +129,7 @@ open class KkkkwoWebDataSet() : AbstractHomePageDataSet() {
         val ulElements: Elements = doc.select("#con_vod_1 ul")
         var index = 0
         for (ulElement in ulElements) {
-            if (index == 1) {//只取第一个播放源
+            if (index == 2) {//只取第一个播放源
                 break
             }
             val ulDoc: Document = Jsoup.parse(ulElement.html())
@@ -152,13 +153,8 @@ open class KkkkwoWebDataSet() : AbstractHomePageDataSet() {
                     1 -> {
                         head = "播放源2"
                     }
-                    2 -> {
-                        head = "下载源1"
-                    }
-                    3 -> {
-                        head = "下载源2"
-                    }
                 }
+                val links = LinkedList<PlayInfo>()
                 for (linkItem in linkElements) {
                     val summary = linkItem.text()
                     val url = host + linkItem.attr("href")
@@ -170,7 +166,20 @@ open class KkkkwoWebDataSet() : AbstractHomePageDataSet() {
                             url
                         )
                     LogUtil.log("$head-> $playInfo")
-                    playInfoData.add(playInfo)
+                    links.add(playInfo)
+                }
+
+                val newPlayInfoData = LinkedList<PlayInfo>()
+                newPlayInfoData.addAll(links.reversed())//倒序排泄
+                mPlayInfoDataSet[head] = newPlayInfoData
+
+                val valueHolder = SelectAdapterLinearLayout.ValueHolder()
+                valueHolder.mTitle = head
+                valueHolder.mData = newPlayInfoData
+                mSourcePlayDataSet.add(valueHolder)
+
+                if (playInfoData.isEmpty()) {
+                    playInfoData.addAll(newPlayInfoData)
                 }
             }
             if (isOk) {
@@ -179,9 +188,6 @@ open class KkkkwoWebDataSet() : AbstractHomePageDataSet() {
 
         }
 
-        val newPlayInfoData = LinkedList<PlayInfo>()
-        newPlayInfoData.addAll(playInfoData.reversed())//倒序排泄
-        playInfoData = newPlayInfoData
     }
 
     override fun parseMorePageData(content: String, action: Int, obj: Any?, mMediaInfo: MediaInfo) {

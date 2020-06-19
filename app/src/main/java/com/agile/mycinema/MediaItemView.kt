@@ -29,7 +29,7 @@ class MediaItemView(context: Context) : FrameLayout(context), ISelectListener {
         mTitleView = findViewById(R.id.mTitleView)
         mTitleView.textSize = fontSize
 
-        var itemParentWidth = Constant.SCREEN_WIDTH / 6
+        var itemParentWidth = Constant.SCREEN_WIDTH / 5
         var itemParentHeight = (itemParentWidth / MEDIA_WIDTH_HEIGHT_SCALE).toInt()
 
         var parentLP = mParentView.layoutParams
