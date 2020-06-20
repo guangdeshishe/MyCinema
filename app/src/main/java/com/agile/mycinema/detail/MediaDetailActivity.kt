@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.Toast
 import com.agile.mycinema.BaseActivity
@@ -39,6 +40,10 @@ class MediaDetailActivity : BaseActivity(), SelectAdapterLinearLayout.SelectItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        );//保持屏幕不变黑
         setContentView(R.layout.activity_media_detail)
         val tmpMediaInfo = intent.getParcelableExtra<MediaInfo>(
             MEDIA_INFO_KEY
