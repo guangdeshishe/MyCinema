@@ -121,6 +121,13 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onLoadPageDataSuccess(content: String, action: Int, obj: Any?) {
+        if (WebPageDataSet is Tv331WebDataSet && action == Tv331WebDataSet.ACTION_MAIN_TV_SHOW) {
+            //首页综艺节目数据
+            val tv331WebDataSet = WebPageDataSet as Tv331WebDataSet
+            tv331WebDataSet.parseHomePageTvShowData(content, action, obj)
+            mHotTvShowAdapter.initData(WebPageDataSet.tvShowDatas)
+            return
+        }
         WebPageDataSet.parseHomePageData(content, action, obj)
 
         mHotMovieTitle.text = WebPageDataSet.mediaTitleSet[MediaType.MOVIE]
@@ -148,6 +155,7 @@ class MainActivity : BaseActivity(),
         mHotTVShowTitle.text = WebPageDataSet.mediaTitleSet[MediaType.TVSHOW]
         val tvShowUrl = WebPageDataSet.mediaMoreUrlSet[MediaType.TVSHOW]
         if (!tvShowUrl.isNullOrEmpty()) {
+            loadPageData(tvShowUrl, Tv331WebDataSet.ACTION_MAIN_TV_SHOW)
             mHotTVShowTitle.setOnClickListener {
                 MoreMediaActivity.open(
                     this,

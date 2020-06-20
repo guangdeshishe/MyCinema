@@ -24,10 +24,43 @@ open class Tv331WebDataSet() : AbstractHomePageDataSet() {
         topTvShowUrl = "$host/index.php/vod/type/id/3.html"//综艺排行
     }
 
+    companion object {
+        const val ACTION_MAIN_TV_SHOW = 1//加载主界面综艺节目
+    }
+
+    fun parseHomePageTvShowData(content: String, action: Int, obj: Any?) {
+        if (action != ACTION_MAIN_TV_SHOW) {
+            return
+        }
+        val doc: Document = Jsoup.parse(content)
+        val ulElements: Elements = doc.select("ul.video-list")
+        mediaDatas.clear()
+        for (ulElement in ulElements) {
+            val ulDoc: Document = Jsoup.parse(ulElement.html())
+            val liElements: Elements = ulDoc.select("li")
+            var type = MediaType.UnKnow;
+            if (liElements.size == 0) {
+                continue
+            }
+            for (lisHtml in liElements) {
+                val liDoc: Document = Jsoup.parse(lisHtml.html())
+                val linkElements: Elements = liDoc.select("a[href]")
+                var title = linkElements[1].text()
+                var imageUrl = linkElements[0].attr("data-original")
+
+                val mediaUrl = host + linkElements[0].attr("href")
+
+                var mediaInfo =
+                    MediaInfo().type(type).title(title).image(imageUrl).url(mediaUrl)
+                        .title(title).isHot(true)
+                tvShowDatas.add(mediaInfo)
+                LogUtil.log(mediaInfo.toString())
+            }
+        }
+    }
+
     override fun parseHomePageData(content: String, action: Int, obj: Any?) {
         val doc: Document = Jsoup.parse(content)
-
-
         mediaTitleSet[MediaType.MOVIE] = "热播电影"
         mediaMoreUrlSet[MediaType.MOVIE] = "$host/index.php/vod/type/id/1.html"
 

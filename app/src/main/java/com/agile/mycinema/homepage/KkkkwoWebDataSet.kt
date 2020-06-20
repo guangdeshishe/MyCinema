@@ -95,6 +95,7 @@ open class KkkkwoWebDataSet() : AbstractHomePageDataSet() {
             val iframeElements: Elements = doc.select("iframe")
             if (iframeElements.size == 0) {
                 NoticeUtil.showToast("获取播放地址失败")
+                return
             }
             playUrl = iframeElements[0].attr("src")//m3u8格式
             LogUtil.log(playInfo.summary + " full-> " + playUrl)
@@ -103,7 +104,9 @@ open class KkkkwoWebDataSet() : AbstractHomePageDataSet() {
             LogUtil.log(playInfo.summary + " m3u8-> " + playUrl)
             return
         }
+        mPlayInfoDataSet.clear()
         playInfoData.clear()
+        mSourcePlayDataSet.clear()
         val doc: Document = Jsoup.parse(content)
 
         val statueBuilder = StringBuilder()
@@ -127,64 +130,44 @@ open class KkkkwoWebDataSet() : AbstractHomePageDataSet() {
         LogUtil.log(describe)
 
         val ulElements: Elements = doc.select("#con_vod_1 ul")
+        val sourceTitleElements = doc.select("div.play-title span")
         var index = 0
         for (ulElement in ulElements) {
-            if (index == 2) {//只取第一个播放源
-                break
-            }
             val ulDoc: Document = Jsoup.parse(ulElement.html())
             val liElements: Elements = ulDoc.select("li")
-            if (liElements.size == 0) {
-                continue
-            }
-            var isOk = true
+            var sourceName = sourceTitleElements[index + 1].text()
+            val links = LinkedList<PlayInfo>()
             for (lisHtml in liElements) {
                 val liDoc: Document = Jsoup.parse(lisHtml.html())
-                val linkElements: Elements = liDoc.select("a[href]")
-                if (linkElements.size == 0) {
-                    isOk = false
-                    break
-                }
-                var head = ""
-                when (index) {
-                    0 -> {
-                        head = "播放源1"
-                    }
-                    1 -> {
-                        head = "播放源2"
-                    }
-                }
-                val links = LinkedList<PlayInfo>()
-                for (linkItem in linkElements) {
-                    val summary = linkItem.text()
-                    val url = host + linkItem.attr("href")
-                    val playInfo =
-                        PlayInfo(
-                            mediaInfo._id,
-                            mediaInfo.title,
-                            summary,
-                            url
-                        )
-                    LogUtil.log("$head-> $playInfo")
-                    links.add(playInfo)
-                }
+                val linkItem = liDoc.select("a[href]")[0]
 
-                val newPlayInfoData = LinkedList<PlayInfo>()
-                newPlayInfoData.addAll(links.reversed())//倒序排泄
-                mPlayInfoDataSet[head] = newPlayInfoData
 
-                val valueHolder = SelectAdapterLinearLayout.ValueHolder()
-                valueHolder.mTitle = head
-                valueHolder.mData = newPlayInfoData
-                mSourcePlayDataSet.add(valueHolder)
+                val summary = linkItem.text()
 
-                if (playInfoData.isEmpty()) {
-                    playInfoData.addAll(newPlayInfoData)
-                }
+                val url = host + linkItem.attr("href")
+                val playInfo =
+                    PlayInfo(
+                        mediaInfo._id,
+                        mediaInfo.title,
+                        summary,
+                        url
+                    )
+                LogUtil.log("$sourceName-> $playInfo")
+                links.add(playInfo)
             }
-            if (isOk) {
-                index++
+            val newPlayInfoData = LinkedList<PlayInfo>()
+            newPlayInfoData.addAll(links.reversed())//倒序排列
+            mPlayInfoDataSet[sourceName] = newPlayInfoData
+
+            val valueHolder = SelectAdapterLinearLayout.ValueHolder()
+            valueHolder.mTitle = sourceName
+            valueHolder.mData = newPlayInfoData
+            mSourcePlayDataSet.add(valueHolder)
+
+            if (playInfoData.isEmpty()) {
+                playInfoData.addAll(newPlayInfoData)
             }
+            index++
 
         }
 

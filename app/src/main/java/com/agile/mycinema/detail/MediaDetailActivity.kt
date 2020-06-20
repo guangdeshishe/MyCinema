@@ -13,10 +13,12 @@ import com.agile.mycinema.MediaInfo
 import com.agile.mycinema.R
 import com.agile.mycinema.utils.Constant
 import com.agile.mycinema.utils.NoticeUtil
+import com.agile.mycinema.view.SelectAdapterLinearLayout
 import kotlinx.android.synthetic.main.activity_media_detail.*
+import java.util.*
 
 
-class MediaDetailActivity : BaseActivity() {
+class MediaDetailActivity : BaseActivity(), SelectAdapterLinearLayout.SelectItemClickListener {
 
     lateinit var mAdapter: PlayGridAdapter
     lateinit var mMediaInfo: MediaInfo
@@ -42,7 +44,7 @@ class MediaDetailActivity : BaseActivity() {
             MEDIA_INFO_KEY
         )
         mMediaInfo = tmpMediaInfo ?: MediaInfo()
-
+        mSourcesPlayList.mSelectItemClickListener = this
         mMediaPlayerContentView.mediaName = mMediaInfo.title
         mTitleView.text = mMediaInfo.title
 
@@ -183,6 +185,11 @@ class MediaDetailActivity : BaseActivity() {
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         mMediaPlayerContentView.dispatchKeyEvent(event)
         return super.dispatchKeyEvent(event)
+    }
+
+    override fun onSelectItemClick(position: Int, data: Any) {
+        val playInfo = data as LinkedList<PlayInfo>
+        mAdapter.initData(playInfo)
     }
 
 }
