@@ -10,6 +10,12 @@ import android.widget.ScrollView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import cdc.sed.yff.AdManager
+import cdc.sed.yff.nm.bn.BannerManager
+import cdc.sed.yff.nm.bn.BannerViewListener
+import cdc.sed.yff.nm.cm.ErrorCode
+import cdc.sed.yff.nm.sp.SpotListener
+import cdc.sed.yff.nm.sp.SpotManager
 import com.agile.mycinema.detail.MediaDetailActivity
 import com.agile.mycinema.homepage.AbstractHomePageDataSet
 import com.agile.mycinema.homepage.KankanwuWebDataSet
@@ -26,7 +32,7 @@ import java.util.*
 
 class MainActivity : BaseActivity(),
     AdapterView.OnItemClickListener, SelectAdapterLinearLayout.SelectItemClickListener,
-    AdapterView.OnItemSelectedListener {
+    AdapterView.OnItemSelectedListener, BannerViewListener {
 
 
     private val permissions = arrayOf(
@@ -66,7 +72,7 @@ class MainActivity : BaseActivity(),
         Constant.MEDIA_SIZE_DIFFER = 4 * Constant.MEDIA_PADDING
 
         log("screenWidth:" + Constant.SCREEN_WIDTH + ";screenHeight:" + Constant.SCREEN_HEIGHT)
-
+        AdManager.getInstance(this).init("ac0b8c774bb13387", "441ad50ca773c866", BuildConfig.DEBUG);
 
         setContentView(R.layout.activity_main)
         mSuggestMediaAdapter = MediaGridAdapter(this)
@@ -118,7 +124,48 @@ class MainActivity : BaseActivity(),
         mMainWebSiteContent.initData(webSiteData)
         mMainWebSiteContent.mSelectItemClickListener = this
 
+        // 显示广告
+        setupBannerAd();
+
+
         requestPermission()
+    }
+
+    private fun setupBannerAd() {
+        /**
+         * 普通布局
+         */
+        val bannerView = BannerManager.getInstance(applicationContext).getBannerView(this, this);
+        ll_banner.addView(bannerView);
+
+
+        // 展示插屏广告
+        SpotManager.getInstance(this).showSpot(this, object : SpotListener {
+            override fun onShowSuccess() {
+                LogUtil.log("插屏展示成功")
+            }
+
+            override fun onShowFailed(errorCode: Int) {
+                LogUtil.log("插屏展示失败")
+                when (errorCode) {
+                    ErrorCode.NON_NETWORK -> showToast("网络异常")
+                    ErrorCode.NON_AD -> showToast("暂无插屏广告")
+                    ErrorCode.RESOURCE_NOT_READY -> showToast("插屏资源还没准备好")
+                    ErrorCode.SHOW_INTERVAL_LIMITED -> showToast("请勿频繁展示")
+                    ErrorCode.WIDGET_NOT_IN_VISIBILITY_STATE -> showToast("请设置插屏为可见状态")
+                    else -> showToast("请稍后再试")
+                }
+            }
+
+            override fun onSpotClosed() {
+                LogUtil.log("插屏被关闭")
+            }
+
+            override fun onSpotClicked(isWebPage: Boolean) {
+                LogUtil.log("插屏被点击")
+                LogUtil.log("是否是网页广告？" + if (isWebPage) "是" else "不是")
+            }
+        })
     }
 
     override fun onSelectItemClick(position: Int, data: Any) {
@@ -280,4 +327,15 @@ class MainActivity : BaseActivity(),
         }
     }
 
+    override fun onRequestFailed() {
+        LogUtil.log("请求广告条失败");
+    }
+
+    override fun onRequestSuccess() {
+        LogUtil.log("请求广告条成功");
+    }
+
+    override fun onSwitchBanner() {
+        LogUtil.log("广告条切换");
+    }
 }
