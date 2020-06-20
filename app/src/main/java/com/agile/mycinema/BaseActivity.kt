@@ -8,6 +8,7 @@ import com.agile.mycinema.utils.NoticeUtil
 import com.lzy.okgo.OkGo
 import com.lzy.okgo.callback.StringCallback
 import com.lzy.okgo.model.Response
+import com.umeng.analytics.MobclickAgent
 import java.io.File
 import java.io.UnsupportedEncodingException
 import java.math.BigInteger
@@ -167,5 +168,15 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         return LinkedList(mediasMap.values)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MobclickAgent.onResume(this);
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MobclickAgent.onPause(this);
     }
 }
