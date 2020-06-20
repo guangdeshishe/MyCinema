@@ -15,6 +15,7 @@ class MediaGridView(context: Context?, attrs: AttributeSet?) : WrapHeightGridVie
     var sourceWidth = 0
     var sourceHeight = 0
     var lastSelectedView: ISelectListener? = null
+    var customerListener: AdapterView.OnItemSelectedListener? = null
 
     init {
         onItemSelectedListener = this
@@ -45,6 +46,7 @@ class MediaGridView(context: Context?, attrs: AttributeSet?) : WrapHeightGridVie
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        customerListener?.onItemSelected(parent, view, position, id)
         handleItemSelect(view)
     }
 
@@ -52,6 +54,8 @@ class MediaGridView(context: Context?, attrs: AttributeSet?) : WrapHeightGridVie
         if (view == null || !isFocused) {
             return
         }
+
+
         if (view is ISelectListener) {
             view.onSelectChanged(true)
         }

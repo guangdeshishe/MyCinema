@@ -17,6 +17,7 @@ import com.agile.mycinema.homepage.KkkkwoWebDataSet
 import com.agile.mycinema.homepage.Tv331WebDataSet
 import com.agile.mycinema.moremedia.MoreMediaActivity
 import com.agile.mycinema.utils.Constant
+import com.agile.mycinema.utils.LogUtil
 import com.agile.mycinema.utils.UnitUtil
 import com.agile.mycinema.view.SelectAdapterLinearLayout
 import kotlinx.android.synthetic.main.activity_main.*
@@ -24,7 +25,8 @@ import java.util.*
 
 
 class MainActivity : BaseActivity(),
-    AdapterView.OnItemClickListener, SelectAdapterLinearLayout.SelectItemClickListener {
+    AdapterView.OnItemClickListener, SelectAdapterLinearLayout.SelectItemClickListener,
+    AdapterView.OnItemSelectedListener {
 
 
     private val permissions = arrayOf(
@@ -83,10 +85,19 @@ class MainActivity : BaseActivity(),
         mHotMicroMovieGridView.adapter = mHotMicroMovieAdapter
 
         mSuggestMediaGridView.onItemClickListener = this
+        mSuggestMediaGridView.customerListener = this
+
         mHotMovieGridView.onItemClickListener = this
+        mHotMovieGridView.customerListener = this
+
         mHotTVGridView.onItemClickListener = this
+        mHotTVGridView.customerListener = this
+
         mHotTVShowGridView.onItemClickListener = this
+        mHotTVShowGridView.customerListener = this
+
         mHotMicroMovieGridView.onItemClickListener = this
+        mHotMicroMovieGridView.customerListener = this
 
         val webSiteData = LinkedList<SelectAdapterLinearLayout.IValueHolder>()
         var valueHolder = SelectAdapterLinearLayout.ValueHolder()
@@ -249,6 +260,24 @@ class MainActivity : BaseActivity(),
             }
         }
         MediaDetailActivity.open(this@MainActivity, mediaInfo)
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+
+        val location = IntArray(2)
+        view.getLocationOnScreen(location)
+        val top = location[1]
+        val bottom = top + view.height
+        LogUtil.log("selectedView:screenHeight:${Constant.SCREEN_HEIGHT},  Top->$top  Bottom->$bottom")
+        if (bottom >= Constant.SCREEN_HEIGHT) {
+            mContentScrollView.scrollBy(0, view.height)
+        } else if (top <= 0) {
+            mContentScrollView.scrollBy(0, -view.height)
+        }
     }
 
 }
