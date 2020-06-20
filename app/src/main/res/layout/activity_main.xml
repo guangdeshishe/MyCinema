@@ -11,30 +11,11 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <com.agile.mycinema.view.SelectAdapterLinearLayout
+            android:id="@+id/mMainWebSiteContent"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <com.agile.mycinema.moremedia.SelectableTextView
-                android:id="@+id/mTv331WebSite"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="叶子影院" />
-
-            <com.agile.mycinema.moremedia.SelectableTextView
-                android:id="@+id/mKankanwuWebSite"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="看看屋" />
-
-            <com.agile.mycinema.moremedia.SelectableTextView
-                android:id="@+id/mKkkkwoWebSite"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="4K屋" />
-        </LinearLayout>
+            android:orientation="vertical" />S
     </ScrollView>
 
     <ScrollView
@@ -60,7 +41,7 @@
                 android:id="@+id/mSuggestMediaGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="5"
+                android:numColumns="6"
                 android:visibility="gone" />
 
             <com.agile.mycinema.CommonTextView
@@ -73,7 +54,7 @@
                 android:id="@+id/mHotMovieGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="5" />
+                android:numColumns="6" />
 
             <com.agile.mycinema.CommonTextView
                 android:id="@+id/mHotTVTitle"
@@ -85,7 +66,7 @@
                 android:id="@+id/mHotTVGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="5" />
+                android:numColumns="6" />
 
             <com.agile.mycinema.CommonTextView
                 android:id="@+id/mHotTVShowTitle"
@@ -97,7 +78,7 @@
                 android:id="@+id/mHotTVShowGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="5" />
+                android:numColumns="6" />
 
             <com.agile.mycinema.CommonTextView
                 android:id="@+id/mHotMicroMovieTitle"
@@ -109,7 +90,7 @@
                 android:id="@+id/mHotMicroMovieGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="5" />
+                android:numColumns="6" />
 
         </LinearLayout>
     </ScrollView>

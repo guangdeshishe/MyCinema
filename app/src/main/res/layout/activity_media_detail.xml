@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:nextFocusRight="@+id/mTitleDescribeView"
-            android:nextFocusDown="@+id/mPlayGridView" />
+            android:nextFocusDown="@+id/mSourcesPlayList" />
 
         <com.agile.mycinema.CommonLinearLayout
             android:id="@+id/mTitleDescribeView"
@@ -29,7 +29,7 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:nextFocusLeft="@+id/mMediaPlayerContentView"
-            android:nextFocusDown="@+id/mPlayGridView"
+            android:nextFocusDown="@+id/mSourcesPlayList"
             android:orientation="vertical">
 
             <TextView
@@ -71,6 +71,9 @@
             android:id="@+id/mSourcesPlayList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:nextFocusUp="@+id/mMediaPlayerContentView"
+            android:nextFocusDown="@+id/mPlayGridView"
             android:orientation="horizontal" />
 
         <com.agile.mycinema.detail.PlayGridView
@@ -79,27 +82,21 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:horizontalSpacing="10dp"
-            android:nextFocusUp="@+id/mMediaPlayerContentView"
+            android:nextFocusUp="@+id/mSourcesPlayList"
             android:numColumns="10"
             android:verticalSpacing="10dp" />
     </LinearLayout>
 
-    <ScrollView
-        android:id="@+id/mDescribeFullContextView"
+
+    <TextView
+        android:id="@+id/mDescribeFullView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#aa000000"
-        android:focusable="true"
         android:padding="50dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/mDescribeFullView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:text="描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述"
-            android:textColor="@color/colorTitle"
-            android:textSize="20sp" />
-    </ScrollView>
+        android:scrollbars="vertical"
+        android:text="描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述"
+        android:textColor="@color/colorTitle"
+        android:textSize="20sp"
+        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

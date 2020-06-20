@@ -18,11 +18,13 @@ import com.agile.mycinema.homepage.Tv331WebDataSet
 import com.agile.mycinema.moremedia.MoreMediaActivity
 import com.agile.mycinema.utils.Constant
 import com.agile.mycinema.utils.UnitUtil
+import com.agile.mycinema.view.SelectAdapterLinearLayout
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 
 class MainActivity : BaseActivity(),
-    AdapterView.OnItemClickListener {
+    AdapterView.OnItemClickListener, SelectAdapterLinearLayout.SelectItemClickListener {
 
 
     private val permissions = arrayOf(
@@ -86,38 +88,37 @@ class MainActivity : BaseActivity(),
         mHotTVShowGridView.onItemClickListener = this
         mHotMicroMovieGridView.onItemClickListener = this
 
-        mTv331WebSite.changeSelected(true)
-        mTv331WebSite.setOnClickListener {
-            mTv331WebSite.changeSelected(true)
-            mKankanwuWebSite.changeSelected(false)
-            mKkkkwoWebSite.changeSelected(false)
-            mContentScrollView.fullScroll(ScrollView.FOCUS_UP)
-            WebPageDataSet = Tv331WebDataSet()
-            initView()
-        }
-        mKankanwuWebSite.setOnClickListener {
-            mTv331WebSite.changeSelected(false)
-            mKankanwuWebSite.changeSelected(true)
-            mKkkkwoWebSite.changeSelected(false)
-            mContentScrollView.fullScroll(ScrollView.FOCUS_UP)
-            WebPageDataSet = KankanwuWebDataSet()
-            initView()
-        }
-        mKkkkwoWebSite.setOnClickListener {
-            mTv331WebSite.changeSelected(false)
-            mKankanwuWebSite.changeSelected(false)
-            mKkkkwoWebSite.changeSelected(true)
-            mContentScrollView.fullScroll(ScrollView.FOCUS_UP)
-            WebPageDataSet = KkkkwoWebDataSet()
-            initView()
-        }
+        val webSiteData = LinkedList<SelectAdapterLinearLayout.IValueHolder>()
+        var valueHolder = SelectAdapterLinearLayout.ValueHolder()
+        valueHolder.mTitle = "资源1"
+        valueHolder.mData = Tv331WebDataSet()
+        webSiteData.add(valueHolder)
+
+        valueHolder = SelectAdapterLinearLayout.ValueHolder()
+        valueHolder.mTitle = "资源2"
+        valueHolder.mData = KankanwuWebDataSet()
+        webSiteData.add(valueHolder)
+
+        valueHolder = SelectAdapterLinearLayout.ValueHolder()
+        valueHolder.mTitle = "资源3"
+        valueHolder.mData = KkkkwoWebDataSet()
+        webSiteData.add(valueHolder)
+
+        mMainWebSiteContent.initData(webSiteData)
+        mMainWebSiteContent.mSelectItemClickListener = this
 
         requestPermission()
     }
 
+    override fun onSelectItemClick(position: Int, data: Any) {
+        val webData = data as AbstractHomePageDataSet
+        WebPageDataSet = webData
+        mContentScrollView.fullScroll(ScrollView.FOCUS_UP)
+        initView()
+    }
+
     fun initView() {
         loadPageData(WebPageDataSet.host)
-
     }
 
     override fun onLoadPageDataSuccess(content: String, action: Int, obj: Any?) {
@@ -155,7 +156,9 @@ class MainActivity : BaseActivity(),
         mHotTVShowTitle.text = WebPageDataSet.mediaTitleSet[MediaType.TVSHOW]
         val tvShowUrl = WebPageDataSet.mediaMoreUrlSet[MediaType.TVSHOW]
         if (!tvShowUrl.isNullOrEmpty()) {
-            loadPageData(tvShowUrl, Tv331WebDataSet.ACTION_MAIN_TV_SHOW)
+            if (WebPageDataSet is Tv331WebDataSet && WebPageDataSet.tvShowDatas.isEmpty()) {//如果综艺首页没有数据，则从更多里拉取
+                loadPageData(tvShowUrl, Tv331WebDataSet.ACTION_MAIN_TV_SHOW)
+            }
             mHotTVShowTitle.setOnClickListener {
                 MoreMediaActivity.open(
                     this,

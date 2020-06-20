@@ -3,6 +3,7 @@ package com.agile.mycinema.detail
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
@@ -54,21 +55,15 @@ class MediaDetailActivity : BaseActivity(), SelectAdapterLinearLayout.SelectItem
         mTitleView.text = mMediaInfo.title
 
         mTitleDescribeView.setOnClickListener {
-            mDescribeFullContextView.visibility = View.VISIBLE
-            mDescribeFullContextView.requestFocus()
+            mDescribeFullView.visibility = View.VISIBLE
+            mDescribeFullView.requestFocus()
         }
         mDescribeView.setOnClickListener {
-            mDescribeFullContextView.visibility = View.VISIBLE
-            mDescribeFullContextView.requestFocus()
+            mDescribeFullView.visibility = View.VISIBLE
+            mDescribeFullView.requestFocus()
         }
-        mDescribeFullContextView.setOnClickListener {
-            mDescribeFullContextView.visibility = View.GONE
-            mTitleDescribeView.requestFocus()
-        }
-        mDescribeFullView.setOnClickListener {
-            mDescribeFullContextView.visibility = View.GONE
-            mTitleDescribeView.requestFocus()
-        }
+        mDescribeFullView.movementMethod = ScrollingMovementMethod.getInstance();
+//
         mAdapter = PlayGridAdapter(this)
         mPlayGridView.adapter = mAdapter
 
@@ -155,8 +150,8 @@ class MediaDetailActivity : BaseActivity(), SelectAdapterLinearLayout.SelectItem
     }
 
     override fun onBackPressed() {
-        if (mDescribeFullContextView.visibility == View.VISIBLE) {
-            mDescribeFullContextView.visibility = View.GONE
+        if (mDescribeFullView.visibility == View.VISIBLE) {
+            mDescribeFullView.visibility = View.GONE
             mTitleDescribeView.requestFocus()
             return
         }
